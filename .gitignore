@@ -1,0 +1,13 @@
+# Ruby + project files
+Gemfile.lock
+Gemfile.local
+pkg
+
+# Tests
+test/reports
+coverage
+
+# RVM
+.rvmrc
+.ruby-version
+.ruby-gemset
