@@ -7,7 +7,7 @@ module ApipieBindings
 
     def initialize(config, options={})
       @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join('/tmp/apipie_bindings', config[:uri].tr(':/', '_'))
-      @apidoc_cache_file = config[:apidoc_cache_file] || File.join(@apidoc_cache_dir, 'apidoc.json')
+      @apidoc_cache_name = config[:apidoc_cache_name] || 'default'
       @api_version = config[:api_version] || 2
       @uri = config[:uri]
 
@@ -32,9 +32,13 @@ module ApipieBindings
       @config = config
     end
 
+    def apidoc_cache_file
+       File.join(@apidoc_cache_dir, "#{@apidoc_cache_name}.json")
+    end
+
     def load_apidoc
-      if File.exist?(@apidoc_cache_file)
-        JSON.parse(File.read(@apidoc_cache_file), :symbolize_names => true)
+      if File.exist?(apidoc_cache_file)
+        JSON.parse(File.read(apidoc_cache_file), :symbolize_names => true)
       end
     end
 
@@ -47,7 +51,7 @@ module ApipieBindings
       rescue
         raise "Could not load data from #{@uri}#{path}"
       end
-      File.open(@apidoc_cache_file, "w") { |f| f.write(response) }
+      File.open(apidoc_cache_file, "w") { |f| f.write(response.body) }
 
       load_apidoc
     end
@@ -99,6 +103,9 @@ module ApipieBindings
 
       args << headers if headers
       response = @client[path].send(*args)
+
+      update_cache(response.headers[:apipie_apidoc_hash])
+
       options[:response] == :raw ? response : process_data(response)
     end
 
@@ -110,6 +117,18 @@ module ApipieBindings
              end
       # logger.debug "Returned data: #{data.inspect}"
       return data
+    end
+
+    def update_cache(cache_name)
+      if !cache_name.nil? && (cache_name != @apidoc_cache_name)
+        clean_cache
+        @apidoc_cache_name = cache_name
+      end
+    end
+
+    def clean_cache
+      @apidoc = nil
+      Dir["#{@apidoc_cache_dir}/*.json"].each { |f| File.delete(f) }
     end
 
   end

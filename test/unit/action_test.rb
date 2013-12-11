@@ -2,13 +2,13 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 describe ApipieBindings::Action do
 
-  let(:resource) { ApipieBindings::API.new({:uri => 'https://localhost', :username => 'admin', :password => 'admin',
-                :apidoc_cache_file => 'test/unit/data/architecture.json'}).resource(:architectures) }
+  let(:resource) { ApipieBindings::API.new({:apidoc_cache_dir => 'test/unit/data',
+    :apidoc_cache_name => 'architecture'}).resource(:architectures) }
 
   it "should allow user to call the action" do
     params = { :a => 1 }
     headers = { :content_type => 'application/json' }
-    ApipieBindings::API.any_instance.expects(:call).with(:architectures, :index, params, headers)
+    ApipieBindings::API.any_instance.expects(:call).with(:architectures, :index, params, headers, {})
     resource.action(:index).call(params, headers)
   end
 
