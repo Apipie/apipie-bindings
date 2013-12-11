@@ -9,6 +9,7 @@ module ApipieBindings
       @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join('/tmp/apipie_bindings', config[:uri].tr(':/', '_'))
       @apidoc_cache_file = config[:apidoc_cache_file] || File.join(@apidoc_cache_dir, 'apidoc.json')
       @api_version = config[:api_version] || 2
+      @uri = config[:uri]
 
       config = config.dup
       # self.logger = config.delete(:logger)
@@ -39,15 +40,14 @@ module ApipieBindings
 
     def retrieve_apidoc
       FileUtils.mkdir_p(@apidoc_cache_dir) unless File.exists?(@apidoc_cache_dir)
-
-      apidoc_url = @config[:uri] + '/apidoc'
-      apidoc_url << "/v#{@api_version}.json"
-      response = Net::HTTP.get_response(URI.parse(apidoc_url))
-      unless response.code == "200"
-        raise "Could not load data from #{url}"
+      path = "/apidoc/v#{@api_version}.json"
+      begin
+        response = http_call('get', path, {},
+          {:accept => "application/json;version=1"}, {:response => :raw})
+      rescue
+        raise "Could not load data from #{@uri}#{path}"
       end
-      body = response.body
-      File.open(@apidoc_cache_file, "w") { |f| f.write(body) }
+      File.open(@apidoc_cache_file, "w") { |f| f.write(response) }
 
       load_apidoc
     end
@@ -69,7 +69,7 @@ module ApipieBindings
       apidoc[:docs][:resources].keys
     end
 
-    def call(resource_name, action_name, params, headers)
+    def call(resource_name, action_name, params={}, headers={}, options={})
       resource = resource(resource_name)
       action = resource.action(action_name)
       route = action.find_route(params)
@@ -78,11 +78,11 @@ module ApipieBindings
         route.method,
         route.path(params),
         params.reject { |par, _| route.params_in_path.include? par.to_s },
-        headers)
+        headers, options)
     end
 
 
-    def http_call(http_method, path, params = { }, headers = { })
+    def http_call(http_method, path, params={}, headers={}, options={})
       headers ||= { }
 
       args = [http_method]
@@ -98,7 +98,8 @@ module ApipieBindings
       # logger.debug "Headers: #{headers.inspect}"
 
       args << headers if headers
-      process_data(@client[path].send(*args))
+      response = @client[path].send(*args)
+      options[:response] == :raw ? response : process_data(response)
     end
 
     def process_data(response)
@@ -108,7 +109,7 @@ module ApipieBindings
                response.body
              end
       # logger.debug "Returned data: #{data.inspect}"
-      return data, response
+      return data
     end
 
   end

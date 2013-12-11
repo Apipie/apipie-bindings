@@ -8,8 +8,8 @@ module ApipieBindings
       @api = api
     end
 
-    def call(params={}, headers={})
-      @api.call(@resource, @name, params, headers)
+    def call(params={}, headers={}, options={})
+      @api.call(@resource, @name, params, headers, options)
     end
 
     def action_doc
