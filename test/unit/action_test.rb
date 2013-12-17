@@ -41,4 +41,13 @@ describe ApipieBindings::Action do
     resource.action(:create).validate!({ :architecture => { :name => 'i386' } })
   end
 
+  it "should have name visible in puts" do
+    out, err = capture_io { puts resource.action(:index) }
+    out.must_equal "<Action :index>\n"
+  end
+
+  it "should have name visible in inspect" do
+    resource.action(:index).inspect.must_equal "<Action :index>"
+  end
+
 end

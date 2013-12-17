@@ -6,7 +6,7 @@ describe ApipieBindings::Resource do
     :apidoc_cache_name => 'architecture'}).resource(:architectures) }
 
   it "should list actions" do
-    resource.actions.must_equal [:index, :show, :create]
+    resource.actions.map(&:name).must_equal [:index, :show, :create]
   end
 
   it "should test action existence" do
@@ -29,4 +29,12 @@ describe ApipieBindings::Resource do
     resource.call(:index)
   end
 
+  it "should have name visible in puts" do
+    out, err = capture_io { puts resource }
+    out.must_equal "<Resource :architectures>\n"
+  end
+
+  it "should have name visible in inspect" do
+    resource.inspect.must_equal "<Resource :architectures>"
+  end
 end

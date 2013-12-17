@@ -14,7 +14,7 @@ describe ApipieBindings::API do
   end
 
   it "should list resources" do
-    api.resources.must_equal [:architectures]
+    api.resources.map(&:name).must_equal [:architectures]
   end
 
   # it "should have apidoc_cache_file available" do

@@ -70,7 +70,7 @@ module ApipieBindings
     end
 
     def resources
-      apidoc[:docs][:resources].keys
+      apidoc[:docs][:resources].keys.map { |res| resource(res) }
     end
 
     def call(resource_name, action_name, params={}, headers={}, options={})

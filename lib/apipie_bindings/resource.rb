@@ -2,6 +2,8 @@ module ApipieBindings
 
   class Resource
 
+    attr_reader :name
+
     def initialize(name, api)
       @name = name
       @api = api
@@ -16,7 +18,7 @@ module ApipieBindings
     end
 
     def actions
-      resource_doc[:methods].map { |action| action[:name].to_sym }
+      resource_doc[:methods].map { |a| action(a[:name].to_sym) }
     end
 
     def has_action?(name)
@@ -25,6 +27,14 @@ module ApipieBindings
 
     def action(name)
       ApipieBindings::Action.new(@name, name, @api)
+    end
+
+    def to_s
+      "<Resource :#{@name}>"
+    end
+
+    def inspect
+      to_s
     end
 
   end

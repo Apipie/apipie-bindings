@@ -2,6 +2,8 @@ module ApipieBindings
 
   class Action
 
+    attr_reader :name
+
     def initialize(resource, name, api)
       @resource = resource
       @name = name
@@ -49,5 +51,14 @@ module ApipieBindings
       #   end
       # end
     end
+
+    def to_s
+      "<Action :#{@name}>"
+    end
+
+    def inspect
+      to_s
+    end
+
   end
 end
