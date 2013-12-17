@@ -5,11 +5,13 @@ module ApipieBindings
 
   class API
 
+    attr_reader :apidoc_cache_name
+
     def initialize(config, options={})
-      @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join('/tmp/apipie_bindings', config[:uri].tr(':/', '_'))
-      @apidoc_cache_name = config[:apidoc_cache_name] || 'default'
-      @api_version = config[:api_version] || 2
       @uri = config[:uri]
+      @api_version = config[:api_version] || 2
+      @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join('/tmp/apipie_bindings', config[:uri].tr(':/', '_'))
+      @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
 
       config = config.dup
       # self.logger = config.delete(:logger)
@@ -30,6 +32,15 @@ module ApipieBindings
 
       @client = RestClient::Resource.new(config[:uri], resource_config)
       @config = config
+    end
+
+    def set_default_name(default='default')
+      cache_file = Dir["#{@apidoc_cache_dir}/*.json"].first
+      if cache_file
+        File.basename(cache_file, ".json")
+      else
+        default
+      end
     end
 
     def apidoc_cache_file

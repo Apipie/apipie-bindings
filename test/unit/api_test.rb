@@ -73,6 +73,12 @@ describe ApipieBindings::API do
       @api.update_cache(nil)
       @api.apidoc.must_equal ['test']
     end
+
+    it "should load cache and its name from cache dir" do
+      FileUtils.cp('test/unit/data/architecture.json', File.join(@dir, 'api_cache.json'))
+      @api = ApipieBindings::API.new({:apidoc_cache_dir => @dir})
+      @api.apidoc_cache_name.must_equal 'api_cache'
+    end
   end
 
 end
