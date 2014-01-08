@@ -2,19 +2,6 @@ This is just a quick preview...
 
 This based on https://github.com/theforeman/foreman_api
 
-```
-$ rake install
-$ irb
-irb(main):001:0> require 'apipie_bindings'
-=> true
-irb(main):002:0> api = ApipieBindings::API.new({:uri => 'http://192.168.122.114:3000/', :username => 'admin', :password => 'changeme'})
-=> #<ApipieBindings::API:0x00000002273308 @apidoc_cache_dir="/tmp/apipie_bindings/http___192.168.122.114_3000_", @apidoc_cache_file="/tmp/apipie_bindings/http___192.168.122.114_3000_/apidoc.json", @api_version=2, @client=#<RestClient::Resource:0x00000002272ef8 @url="http://192.168.122.114:3000/", @block=nil, @options={:user=>"admin", :password=>"changeme", :oauth=>nil, :headers=>{:content_type=>"application/json", :accept=>"application/json;version=2"}}>, @config={:uri=>"http://192.168.122.114:3000/", :username=>"admin", :password=>"changeme"}>
-irb(main):003:0> api.resource(:architectures).actions
-=> [:index, :show, :create, :update, :destroy]
-irb(main):004:0> api.resource(:architectures).call(:index)
-=> [[{"architecture"=>{"name"=>"x86_64", "id"=>1, "created_at"=>"2013-10-17T20:42:08Z", "operatingsystem_ids"=>[], "updated_at"=>"2013-10-17T20:42:08Z"}}, {"architecture"=>{"name"=>"i386", "id"=>2, "created_at"=>"2013-10-17T20:42:08Z", "operatingsystem_ids"=>[], "updated_at"=>"2013-10-17T20:42:08Z"}}, {"architecture"=>{"name"=>"x86_63", "id"=>3, "created_at"=>"2013-10-18T10:07:23Z", "operatingsystem_ids"=>[], "updated_at"=>"2013-10-18T10:07:23Z"}}, {"architecture"=>{"name"=>"x86_62", "id"=>4, "created_at"=>"2013-10-18T10:08:06Z", "operatingsystem_ids"=>[], "updated_at"=>"2013-10-18T10:08:06Z"}}], "[{\"architecture\":{\"name\":\"x86_64\",\"id\":1,\"created_at\":\"2013-10-17T20:42:08Z\",\"operatingsystem_ids\":[],\"updated_at\":\"2013-10-17T20:42:08Z\"}},{\"architecture\":{\"name\":\"i386\",\"id\":2,\"created_at\":\"2013-10-17T20:42:08Z\",\"operatingsystem_ids\":[],\"updated_at\":\"2013-10-17T20:42:08Z\"}},{\"architecture\":{\"name\":\"x86_63\",\"id\":3,\"created_at\":\"2013-10-18T10:07:23Z\",\"operatingsystem_ids\":[],\"updated_at\":\"2013-10-18T10:07:23Z\"}},{\"architecture\":{\"name\":\"x86_62\",\"id\":4,\"created_at\":\"2013-10-18T10:08:06Z\",\"operatingsystem_ids\":[],\"updated_at\":\"2013-10-18T10:08:06Z\"}}]"]
-
-```
 
 Features
 --------
@@ -25,23 +12,61 @@ The bindings cache the apidoc from the server. It has separated caches for each 
 Sample patch for the server can be found here https://github.com/mbacovsky/foreman/commit/d35d76b9032bb3d3de2da7fb1dc780600eb08bdd
 
 #### API introspection
-It is possible to list available resources, actions and other params
+It is possible to list available resources, actions, params, routes and its attributes
 
+##### Getting started
 ```
-irb(main):003:0> api.resource(:architectures).actions
-=> [:index, :show, :create, :update, :destroy]
+$ rake install
+$ irb
+irb(main):003:0> require 'apipie_bindings'
 
-irb(main):004:0> api.resources
-[
-    [ 0] :roles,
-    [ 1] :images,
-    [ 2] :reports,
-    ...
-    [42] :host_classes
-]
+irb(main):001:0> api = ApipieBindings::API.new({:uri => 'http://localhost:3000/', :username => 'admin', :password => :changeme})
 ```
 
+##### Listing resources
 
+```
+irb(main):005:0> api.resources
+=> [<Resource :roles>, <Resource :images>, <Resource :reports>, <Resource :hosts>, .... <Resource :architectures>]
+```
+
+##### Listing actions
+
+```
+irb(main):006:0> api.resource(:architectures).actions
+=> [<Action :index>, <Action :show>, <Action :create>, <Action :update>, <Action :destroy>]
+```
+
+##### Listing routes
+```
+irb(main):008:0> api.resource(:architectures).action(:show).routes
+=> [<Route /api/architectures/:id>]
+```
+
+##### Listing params
+
+```
+irb(main):007:0> api.resource(:architectures).action(:show).params
+=> [<Param *id (String)>]
+
+
+irb(main):009:0> api.resource(:architectures).action(:show).params.first.required?
+=> true
+```
+
+##### Calling methods (all the calls bellow are equivalent)
+
+```
+irb(main):012:0> api.resource(:architectures).call(:show, :id => 1)
+=> {"name"=>"x86_64", "id"=>1, "created_at"=>"2013-12-03T15:00:08Z", "updated_at"=>"2013-12-03T15:00:08Z"}
+
+irb(main):013:0> api.call(:architectures, :show, :id => 1)
+=> {"name"=>"x86_64", "id"=>1, "created_at"=>"2013-12-03T15:00:08Z", "updated_at"=>"2013-12-03T15:00:08Z"}
+
+irb(main):014:0> api.resource(:architectures).action(:show).call(:id => 1)
+=> {"name"=>"x86_64", "id"=>1, "created_at"=>"2013-12-03T15:00:08Z", "updated_at"=>"2013-12-03T15:00:08Z"}
+
+```
 
 TODO
 ----
