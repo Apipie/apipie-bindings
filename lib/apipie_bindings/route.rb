@@ -18,10 +18,18 @@ module ApipieBindings
       return @path if params.nil?
 
       path = params_in_path.inject(@path) do |p, param_name|
-        param_value = params[param_name.to_sym] or
+        param_value = (params[param_name.to_sym] or params[param_name.to_s]) or
           raise ArgumentError, "missing param '#{param_name}' in parameters"
         p.sub(":#{param_name}", URI.escape(param_value.to_s))
       end
+    end
+
+    def to_s
+      "<Route #{@path}>"
+    end
+
+    def inspect
+      to_s
     end
 
   end

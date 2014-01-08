@@ -44,4 +44,14 @@ describe ApipieBindings::Param do
   it "should have validator" do
     param.validator.must_equal "Must be a Hash"
   end
+
+  it "should have full name, type and required visible in puts" do
+    out, err = capture_io { puts param }
+    out.must_equal "<Param *architecture (Hash)>\n"
+  end
+
+  it "should have full name, type and required visible in inspect" do
+    param.inspect.must_equal "<Param *architecture (Hash)>"
+  end
+
 end

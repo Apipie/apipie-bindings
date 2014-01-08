@@ -26,5 +26,7 @@ EOF
   s.add_dependency 'json'
   s.add_dependency 'rest-client', '>= 1.6.1'
   s.add_dependency 'oauth'
+  s.add_dependency 'activesupport'
+
 
 end

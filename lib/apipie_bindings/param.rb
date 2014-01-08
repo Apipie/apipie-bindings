@@ -21,6 +21,14 @@ module ApipieBindings
       @required
     end
 
+    def to_s
+      "<Param #{ required? ? '*' : '' }#{@name} (#{@expected_type.capitalize})>"
+    end
+
+    def inspect
+      to_s
+    end
+
   end
 
 end

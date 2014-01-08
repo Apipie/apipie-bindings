@@ -20,6 +20,10 @@ describe ApipieBindings::Action do
     resource.action(:index).find_route.path.must_equal "/api/architectures"
   end
 
+  it "should return params" do
+    resource.action(:create).params.map(&:name).must_equal ['architecture']
+  end
+
   # TODO add tests for more find_route cases
     # @param possible_apis [Array] Array of hasahs in form of
     #   [{:api_url => '/path1', :http_method => 'GET'}, {...}]

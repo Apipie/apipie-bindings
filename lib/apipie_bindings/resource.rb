@@ -1,3 +1,5 @@
+require 'active_support/core_ext/string'
+
 module ApipieBindings
 
   class Resource
@@ -5,6 +7,7 @@ module ApipieBindings
     attr_reader :name
 
     def initialize(name, api)
+      raise NameError.new("Resource '#{name}' does not exist in the API") unless api.apidoc[:docs][:resources].key?(name)
       @name = name
       @api = api
     end
@@ -27,6 +30,10 @@ module ApipieBindings
 
     def action(name)
       ApipieBindings::Action.new(@name, name, @api)
+    end
+
+    def singular_name
+      @name.to_s.singularize
     end
 
     def to_s

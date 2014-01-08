@@ -28,6 +28,12 @@ module ApipieBindings
       end
     end
 
+    def params
+      action_doc[:params].map do |param|
+        ApipieBindings::Param.new(param)
+      end
+    end
+
     def find_route(params={})
       sorted_routes = routes.sort_by { |r| [-1 * r.params_in_path.count, r.path] }
 

@@ -29,6 +29,10 @@ describe ApipieBindings::Resource do
     resource.call(:index)
   end
 
+  it "should print name in singular on demand" do
+    resource.singular_name.must_equal 'architecture'
+  end
+
   it "should have name visible in puts" do
     out, err = capture_io { puts resource }
     out.must_equal "<Resource :architectures>\n"
@@ -36,5 +40,10 @@ describe ApipieBindings::Resource do
 
   it "should have name visible in inspect" do
     resource.inspect.must_equal "<Resource :architectures>"
+  end
+
+  it "should rise error when the resource does no exist" do
+    assert_raises( NameError ){ ApipieBindings::API.new({:apidoc_cache_dir => 'test/unit/data',
+      :apidoc_cache_name => 'architecture'}).resource(:none) }
   end
 end
