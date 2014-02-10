@@ -16,16 +16,16 @@ module ApipieBindings
       @api.call(@name, action, params, headers, options)
     end
 
-    def resource_doc
+    def apidoc
       @api.apidoc[:docs][:resources][@name]
     end
 
     def actions
-      resource_doc[:methods].map { |a| action(a[:name].to_sym) }
+      apidoc[:methods].map { |a| action(a[:name].to_sym) }
     end
 
     def has_action?(name)
-      resource_doc[:methods].any? { |action| action[:name].to_sym == name }
+      apidoc[:methods].any? { |action| action[:name].to_sym == name }
     end
 
     def action(name)

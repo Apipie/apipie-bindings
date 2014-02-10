@@ -14,7 +14,7 @@ module ApipieBindings
       @api.call(@resource, @name, params, headers, options)
     end
 
-    def action_doc
+    def apidoc
       methods = @api.apidoc[:docs][:resources][@resource][:methods].select do |action|
         action[:name].to_sym == @name
       end
@@ -22,14 +22,14 @@ module ApipieBindings
     end
 
     def routes
-      action_doc[:apis].map do |api|
+      apidoc[:apis].map do |api|
         ApipieBindings::Route.new(
           api[:api_url], api[:http_method], api[:short_description])
       end
     end
 
     def params
-      action_doc[:params].map do |param|
+      apidoc[:params].map do |param|
         ApipieBindings::Param.new(param)
       end
     end

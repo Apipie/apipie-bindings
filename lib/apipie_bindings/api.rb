@@ -9,7 +9,7 @@ module ApipieBindings
     attr_reader :apidoc_cache_name
 
     def initialize(config, options={})
-      @uri = config[:uri] or raise ArgumentError.new('Service URI is missing')
+      @uri = config[:uri]
       @api_version = config[:api_version] || 2
       @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join('/tmp/apipie_bindings', @uri.tr(':/', '_'))
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
