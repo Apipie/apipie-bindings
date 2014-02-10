@@ -6,7 +6,7 @@ module ApipieBindings
 
     def initialize(resource, name, api)
       @resource = resource
-      @name = name
+      @name = name.to_sym
       @api = api
     end
 

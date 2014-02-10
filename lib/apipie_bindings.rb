@@ -1,3 +1,11 @@
+module ApipieBindings
+
+  def self.log
+    Logging.logger['API']
+  end
+
+end
+
 require 'apipie_bindings/version'
 require 'apipie_bindings/api'
 require 'apipie_bindings/resource'

@@ -1,6 +1,7 @@
 require 'json'
 require 'rest_client'
 require 'oauth'
+require 'logging'
 module ApipieBindings
 
   class API
@@ -8,9 +9,9 @@ module ApipieBindings
     attr_reader :apidoc_cache_name
 
     def initialize(config, options={})
-      @uri = config[:uri]
+      @uri = config[:uri] or raise ArgumentError.new('Service URI is missing')
       @api_version = config[:api_version] || 2
-      @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join('/tmp/apipie_bindings', config[:uri].tr(':/', '_'))
+      @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join('/tmp/apipie_bindings', @uri.tr(':/', '_'))
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
 
       config = config.dup
@@ -63,7 +64,7 @@ module ApipieBindings
         raise "Could not load data from #{@uri}#{path}"
       end
       File.open(apidoc_cache_file, "w") { |f| f.write(response.body) }
-
+      ApipieBindings.log.debug "New apidoc loaded from the server"
       load_apidoc
     end
 
@@ -107,9 +108,8 @@ module ApipieBindings
         headers[:params] = params if params
       end
 
-      # TODO logging
-      # logger.info "#{http_method.upcase} #{path}"
-      # logger.debug "Params: #{params.inspect}"
+      ApipieBindings.log.info "#{http_method.to_s.upcase} #{path}"
+      ApipieBindings.log.debug "Params: #{params.ai}"
       # logger.debug "Headers: #{headers.inspect}"
 
       args << headers if headers
@@ -117,7 +117,9 @@ module ApipieBindings
 
       update_cache(response.headers[:apipie_apidoc_hash])
 
-      options[:response] == :raw ? response : process_data(response)
+      result = options[:response] == :raw ? response : process_data(response)
+      ApipieBindings.log.debug "Response #{result.ai}"
+      result
     end
 
     def process_data(response)
@@ -133,6 +135,7 @@ module ApipieBindings
     def update_cache(cache_name)
       if !cache_name.nil? && (cache_name != @apidoc_cache_name)
         clean_cache
+        ApipieBindings.log.debug "Cache expired. (#{@apidoc_cache_name} -> #{cache_name})"
         @apidoc_cache_name = cache_name
       end
     end
