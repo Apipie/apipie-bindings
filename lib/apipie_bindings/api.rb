@@ -2,20 +2,22 @@ require 'json'
 require 'rest_client'
 require 'oauth'
 require 'logging'
+require 'awesome_print'
 module ApipieBindings
 
   class API
 
     attr_reader :apidoc_cache_name
+    attr_writer :dry_run
 
     def initialize(config, options={})
       @uri = config[:uri]
       @api_version = config[:api_version] || 2
       @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join('/tmp/apipie_bindings', @uri.tr(':/', '_'))
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
+      @dry_run = config[:dry_run] || false
 
       config = config.dup
-      # self.logger = config.delete(:logger)
 
       headers = {
         :content_type => 'application/json',
@@ -73,6 +75,10 @@ module ApipieBindings
       @apidoc
     end
 
+    def dry_run?
+      @dry_run ? true : false
+    end
+
     def has_resource?(name)
       apidoc[:docs][:resources].has_key? name
     end
@@ -90,6 +96,7 @@ module ApipieBindings
       action = resource.action(action_name)
       route = action.find_route(params)
       #action.validate(params)
+      options[:fake_response] ||= action.examples.first if dry_run?
       return http_call(
         route.method,
         route.path(params),
@@ -113,9 +120,15 @@ module ApipieBindings
       # logger.debug "Headers: #{headers.inspect}"
 
       args << headers if headers
-      response = @client[path].send(*args)
 
-      update_cache(response.headers[:apipie_apidoc_hash])
+      if dry_run?
+        empty_response = ApipieBindings::Example.new('', '', '', 200, '')
+        ex = options[:fake_response ] || empty_response
+        response = RestClient::Response.create(ex.response, ex.status, ex.args)
+      else
+        response = @client[path].send(*args)
+        update_cache(response.headers[:apipie_apidoc_hash])
+      end
 
       result = options[:response] == :raw ? response : process_data(response)
       ApipieBindings.log.debug "Response #{result.ai}"

@@ -34,6 +34,21 @@ describe ApipieBindings::API do
     api.call(:architectures, :show, params, headers)
   end
 
+  it "should return values from examples in dry_run mode" do
+    api.dry_run = true
+    result = api.call(:architectures, :index)
+    result.must_be_kind_of Array
+  end
+
+  it "should allow to set dry_run mode in config params" do
+    api = ApipieBindings::API.new({
+      :apidoc_cache_dir => 'test/unit/data',
+      :apidoc_cache_name => 'architecture',
+      :dry_run => true })
+    result = api.call(:architectures, :index)
+    result.must_be_kind_of Array
+  end
+
   context "update_cache" do
 
     before :each do
