@@ -54,4 +54,8 @@ describe ApipieBindings::Action do
     resource.action(:index).inspect.must_equal "<Action :index>"
   end
 
+  it "should have examples" do
+    resource.action(:index).examples.length.must_equal 1
+  end
+
 end

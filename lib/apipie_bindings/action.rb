@@ -34,6 +34,12 @@ module ApipieBindings
       end
     end
 
+    def examples
+      apidoc[:examples].map do |example|
+        ApipieBindings::Example.parse(example)
+      end
+    end
+
     def find_route(params={})
       sorted_routes = routes.sort_by { |r| [-1 * r.params_in_path.count, r.path] }
 
