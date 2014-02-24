@@ -1,0 +1,1 @@
+require 'apipie_bindings'

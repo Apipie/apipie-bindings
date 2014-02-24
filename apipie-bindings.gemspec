@@ -4,15 +4,15 @@ require "apipie_bindings/version"
 
 Gem::Specification.new do |s|
 
-  s.name          = "apipie_bindings"
+  s.name          = "apipie-bindings"
   s.version       = ApipieBindings.version.dup
   s.platform      = Gem::Platform::RUBY
   s.authors       = ["Martin Bačovský"]
   s.email         = "mbacovsk@redhat.com"
-  s.homepage      = "http://github.com/theforeman/apipie_bindings"
+  s.homepage      = "http://github.com/Apipie/apipie-bindings"
   s.license       = "GPL-3"
 
-  s.summary       = %q{Bindings for Apipie documented APIs}
+  s.summary       = %q{The Ruby bindings for Apipie documented APIs}
   s.description   = <<EOF
 Bindings for API calls that are documented with Apipie. Bindings are generated on the fly.
 EOF
@@ -28,6 +28,5 @@ EOF
   s.add_dependency 'oauth'
   s.add_dependency 'activesupport'
   s.add_dependency 'i18n'
-
 
 end

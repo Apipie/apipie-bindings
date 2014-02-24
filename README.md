@@ -1,7 +1,7 @@
-This is just a quick preview...
+Apipie Bindings
+===============
 
-This based on https://github.com/theforeman/foreman_api
-
+The Ruby bindings for Apipie documented APIs.
 
 Features
 --------
@@ -18,7 +18,7 @@ It is possible to list available resources, actions, params, routes and its attr
 ```
 $ rake install
 $ irb
-irb(main):003:0> require 'apipie_bindings'
+irb(main):003:0> require 'apipie-bindings'
 
 irb(main):001:0> api = ApipieBindings::API.new({:uri => 'http://localhost:3000/', :username => 'admin', :password => :changeme})
 ```
@@ -75,3 +75,9 @@ TODO
 * error handling
 * logging
 * lots of other things
+
+
+License
+-------
+
+This project is licensed under the GPLv3+.
