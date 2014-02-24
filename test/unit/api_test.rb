@@ -49,6 +49,16 @@ describe ApipieBindings::API do
     result.must_be_kind_of Array
   end
 
+  it "should allow to set fake response in config params" do
+    api = ApipieBindings::API.new({
+      :apidoc_cache_dir => 'test/unit/data',
+      :apidoc_cache_name => 'architecture',
+      :dry_run => true,
+      :fake_params => { [:architectures, :index] => {:default => [] } }} )
+    result = api.call(:architectures, :index)
+    result.must_be_kind_of Array
+  end
+
   context "update_cache" do
 
     before :each do

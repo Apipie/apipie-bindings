@@ -7,7 +7,7 @@ module ApipieBindings
 
   class API
 
-    attr_reader :apidoc_cache_name
+    attr_reader :apidoc_cache_name, :fake_responses
     attr_writer :dry_run
 
     def initialize(config, options={})
@@ -16,6 +16,7 @@ module ApipieBindings
       @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join('/tmp/apipie_bindings', @uri.tr(':/', '_'))
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
       @dry_run = config[:dry_run] || false
+      @fake_responses = {}
 
       config = config.dup
 
@@ -96,7 +97,7 @@ module ApipieBindings
       action = resource.action(action_name)
       route = action.find_route(params)
       #action.validate(params)
-      options[:fake_response] ||= action.examples.first if dry_run?
+      options[:fake_response] = find_match(fake_responses, resource_name, action_name, params) || action.examples.first if dry_run?
       return http_call(
         route.method,
         route.path(params),
@@ -156,6 +157,20 @@ module ApipieBindings
     def clean_cache
       @apidoc = nil
       Dir["#{@apidoc_cache_dir}/*.json"].each { |f| File.delete(f) }
+    end
+
+    private
+
+    def find_match(fakes, resource, action, params)
+      resource = fakes[[resource, action]]
+      if resource
+        if resource.has_key?(params)
+          return resource[params]
+        elsif resource.has_key?(:default)
+          return resource[:default]
+        end
+      end
+      return nil
     end
 
   end
