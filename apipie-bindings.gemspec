@@ -28,5 +28,6 @@ EOF
   s.add_dependency 'oauth'
   s.add_dependency 'activesupport'
   s.add_dependency 'i18n'
+  s.add_dependency 'awesome_print'
 
 end

@@ -15,5 +15,3 @@ require "minitest-spec-context"
 require "mocha/setup"
 
 require 'apipie_bindings'
-
-Logging.logger.root.appenders = Logging::Appenders['__test__'] || Logging::Appenders::StringIo.new('__test__')

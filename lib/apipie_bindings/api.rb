@@ -1,8 +1,8 @@
 require 'json'
 require 'rest_client'
 require 'oauth'
-require 'logging'
 require 'awesome_print'
+require 'logger'
 module ApipieBindings
 
   class API
@@ -17,6 +17,12 @@ module ApipieBindings
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
       @dry_run = config[:dry_run] || false
       @fake_responses = {}
+
+      @logger = config[:logger]
+      unless @logger
+        @logger = Logger.new(STDERR)
+        @logger.level = Logger::ERROR
+      end
 
       config = config.dup
 
@@ -67,7 +73,7 @@ module ApipieBindings
         raise "Could not load data from #{@uri}#{path}"
       end
       File.open(apidoc_cache_file, "w") { |f| f.write(response.body) }
-      ApipieBindings.log.debug "New apidoc loaded from the server"
+      log.debug "New apidoc loaded from the server"
       load_apidoc
     end
 
@@ -116,9 +122,8 @@ module ApipieBindings
         headers[:params] = params if params
       end
 
-      ApipieBindings.log.info "#{http_method.to_s.upcase} #{path}"
-      ApipieBindings.log.debug "Params: #{params.ai}"
-      # logger.debug "Headers: #{headers.inspect}"
+      log.info "#{http_method.to_s.upcase} #{path}"
+      log.debug "Params: #{params.ai}"
 
       args << headers if headers
 
@@ -132,7 +137,7 @@ module ApipieBindings
       end
 
       result = options[:response] == :raw ? response : process_data(response)
-      ApipieBindings.log.debug "Response #{result.ai}"
+      log.debug "Response #{result.ai}"
       result
     end
 
@@ -149,7 +154,7 @@ module ApipieBindings
     def update_cache(cache_name)
       if !cache_name.nil? && (cache_name != @apidoc_cache_name)
         clean_cache
-        ApipieBindings.log.debug "Cache expired. (#{@apidoc_cache_name} -> #{cache_name})"
+        log.debug "Cache expired. (#{@apidoc_cache_name} -> #{cache_name})"
         @apidoc_cache_name = cache_name
       end
     end
@@ -157,6 +162,10 @@ module ApipieBindings
     def clean_cache
       @apidoc = nil
       Dir["#{@apidoc_cache_dir}/*.json"].each { |f| File.delete(f) }
+    end
+
+    def log
+      @logger
     end
 
     private
