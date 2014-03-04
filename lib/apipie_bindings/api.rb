@@ -133,7 +133,7 @@ module ApipieBindings
         response = RestClient::Response.create(ex.response, ex.status, ex.args)
       else
         response = @client[path].send(*args)
-        update_cache(response.headers[:apipie_apidoc_hash])
+        update_cache(response.headers[:apipie_checksum])
       end
 
       result = options[:response] == :raw ? response : process_data(response)
