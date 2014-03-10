@@ -2,6 +2,7 @@ require 'json'
 require 'rest_client'
 require 'oauth'
 require 'awesome_print'
+require 'apipie_bindings/rest_client_oauth'
 require 'logger'
 module ApipieBindings
 
