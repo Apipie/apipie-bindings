@@ -4,6 +4,7 @@ require 'oauth'
 require 'awesome_print'
 require 'apipie_bindings/rest_client_oauth'
 require 'logger'
+require 'tmpdir'
 module ApipieBindings
 
   class API
@@ -14,7 +15,7 @@ module ApipieBindings
     def initialize(config, options={})
       @uri = config[:uri]
       @api_version = config[:api_version] || 2
-      @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join('/tmp/apipie_bindings', @uri.tr(':/', '_'))
+      @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join(Dir.tmpdir, 'apipie_bindings', @uri.tr(':/', '_'))
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
       @dry_run = config[:dry_run] || false
       @check_cache_on_start = config[:check_cache_on_start] || false
