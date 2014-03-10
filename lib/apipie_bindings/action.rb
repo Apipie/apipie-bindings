@@ -29,8 +29,12 @@ module ApipieBindings
     end
 
     def params
-      apidoc[:params].map do |param|
-        ApipieBindings::Param.new(param)
+      if apidoc
+        apidoc[:params].map do |param|
+          ApipieBindings::Param.new(param)
+        end
+      else
+        []
       end
     end
 
