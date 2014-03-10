@@ -16,6 +16,7 @@ module ApipieBindings
       @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join('/tmp/apipie_bindings', @uri.tr(':/', '_'))
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
       @dry_run = config[:dry_run] || false
+      @check_cache_on_start = config[:check_cache_on_start] || false
       @fake_responses = {}
 
       @logger = config[:logger]
@@ -42,6 +43,7 @@ module ApipieBindings
 
       @client = RestClient::Resource.new(config[:uri], resource_config)
       @config = config
+      check_cache if @check_cache_on_start
     end
 
     def set_default_name(default='default')
@@ -68,7 +70,7 @@ module ApipieBindings
       path = "/apidoc/v#{@api_version}.json"
       begin
         response = http_call('get', path, {},
-          {:accept => "application/json;version=1"}, {:response => :raw})
+          {:accept => "application/json"}, {:response => :raw})
       rescue
         raise "Could not load data from #{@uri}#{path}"
       end
@@ -162,6 +164,15 @@ module ApipieBindings
     def clean_cache
       @apidoc = nil
       Dir["#{@apidoc_cache_dir}/*.json"].each { |f| File.delete(f) }
+    end
+
+    def check_cache
+      begin
+        response = http_call('get', "/apidoc/apipie_checksum", {}, {:accept => "application/json"})
+        response['checksum']
+      rescue
+        nil
+      end
     end
 
     def log
