@@ -1,5 +1,3 @@
-require 'active_support/core_ext/hash/indifferent_access'
-
 module ApipieBindings
 
   class Param
@@ -7,7 +5,7 @@ module ApipieBindings
     attr_reader :name, :params, :expected_type, :description, :validator
 
     def initialize(param)
-      param = param.with_indifferent_access
+      param = ApipieBindings::IndifferentHash.new(param)
       @name = param[:name]
       params = param[:params] || []
       @params = params.map { |p| ApipieBindings::Param.new(p) }

@@ -1,5 +1,3 @@
-require 'active_support/core_ext/string'
-
 module ApipieBindings
 
   class Resource
@@ -33,7 +31,7 @@ module ApipieBindings
     end
 
     def singular_name
-      @name.to_s.singularize
+      ApipieBindings::Inflector.singularize(@name.to_s)
     end
 
     def to_s
