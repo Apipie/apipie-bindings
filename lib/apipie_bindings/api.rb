@@ -18,7 +18,7 @@ module ApipieBindings
       @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join(Dir.tmpdir, 'apipie_bindings', @uri.tr(':/', '_'))
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
       @dry_run = config[:dry_run] || false
-      @check_cache_on_start = config[:check_cache_on_start] || false
+      @aggressive_cache_checking = config[:aggressive_cache_checking] || false
       @fake_responses = {}
 
       @logger = config[:logger]
@@ -45,7 +45,6 @@ module ApipieBindings
 
       @client = RestClient::Resource.new(config[:uri], resource_config)
       @config = config
-      check_cache if @check_cache_on_start
     end
 
     def set_default_name(default='default')
@@ -62,6 +61,7 @@ module ApipieBindings
     end
 
     def load_apidoc
+      check_cache if @aggressive_cache_checking
       if File.exist?(apidoc_cache_file)
         JSON.parse(File.read(apidoc_cache_file), :symbolize_names => true)
       end
@@ -103,6 +103,7 @@ module ApipieBindings
     end
 
     def call(resource_name, action_name, params={}, headers={}, options={})
+      check_cache if @aggressive_cache_checking
       resource = resource(resource_name)
       action = resource.action(action_name)
       route = action.find_route(params)
