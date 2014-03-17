@@ -3,6 +3,9 @@ Gemfile.lock
 Gemfile.local
 pkg
 
+#Docs
+.yardoc/
+
 # Tests
 test/reports
 coverage

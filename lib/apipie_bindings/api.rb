@@ -12,6 +12,37 @@ module ApipieBindings
     attr_reader :apidoc_cache_name, :fake_responses
     attr_writer :dry_run
 
+    # Creates new API bindings instance
+    # @param [Hash] config API bindings configuration
+    # @option config [String] :uri base URL of the server
+    # @option config [String] :username username to access the API
+    # @option config [String] :password username to access the API
+    # @option config [Hash]   :oauth options to access API using OAuth
+    #   * *:consumer_key* (String) OAuth key
+    #   * *:consumer_secret* (String) OAuth secret
+    #   * *:options* (Hash) options passed to OAuth
+    # @option config [Hash] :headers additional headers to send with the requests
+    # @option config [String] :api_version ('1') version of the API
+    # @option config [String] :apidoc_cache_dir ('/tmp/apipie_bindings/<URI>') where
+    #   to cache the JSON description of the API
+    # @option config [String] :apidoc_cache_name ('default.json') name of te cache file.
+    #   If there is cache in the :apidoc_cache_dir, it is used.
+    # @option config [Hash] :fake_responses ({}) responses to return if used in dry run mode
+    # @option config [Bool] :dry_run (false) dry run mode allows to test your scripts
+    #   and not touch the API. The results are taken form exemples in the API description
+    #   or from the :fake_responses
+    # @option config [Bool] :aggressive_cache_checking (false) check before every request
+    #   if the local cache of API description (JSON) is up to date. By default it is checked
+    #   *after* each API request
+    # @option config [Object] :logger (Logger.new(STDERR)) custom logger class
+    # @param [Hash] options params that are passed to ResClient as-is
+    # @example connect to a server
+    #   ApipieBindings::API.new({:uri => 'http://localhost:3000/',
+    #     :username => 'admin', :password => 'changeme',
+    #     :api_version => '2', :aggressive_cache_checking => true})
+    # @example connect with a local API description
+    #   ApipieBindings::API.new({:apidoc_cache_dir => 'test/unit/data',
+    #     :apidoc_cache_name => 'architecture'})
     def initialize(config, options={})
       @uri = config[:uri]
       @api_version = config[:api_version] || 1
@@ -19,7 +50,7 @@ module ApipieBindings
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
       @dry_run = config[:dry_run] || false
       @aggressive_cache_checking = config[:aggressive_cache_checking] || false
-      @fake_responses = {}
+      @fake_responses = config[:fake_responses] || {}
 
       @logger = config[:logger]
       unless @logger
@@ -98,6 +129,8 @@ module ApipieBindings
       ApipieBindings::Resource.new(name, self)
     end
 
+    # List available resources
+    # @return [Array<ApipieBindings::Resource>]
     def resources
       apidoc[:docs][:resources].keys.map { |res| resource(res) }
     end

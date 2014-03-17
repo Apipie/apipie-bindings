@@ -20,8 +20,8 @@ EOF
   s.files            = `git ls-files -- {lib,bin,doc,config,test}/* README* LICENSE`.split("\n")
   s.test_files       = `git ls-files -- test/*`.split("\n")
   s.extra_rdoc_files = `git ls-files -- {doc,config}/* README*`.split("\n")
-  s.require_paths = ["lib"]
-  # s.executables = ['hammer']
+  s.has_rdoc         = 'yard'
+  s.require_paths    = ["lib"]
 
   s.add_dependency 'json'
   s.add_dependency 'rest-client', '>= 1.6.1'

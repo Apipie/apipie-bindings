@@ -7,9 +7,9 @@ Features
 --------
 
 #### Caching
-The bindings cache the apidoc from the server. It has separated caches for each server it connects to. If the server sends apidoc hash in the headers ```Apipie-Apidoc-Hash: <md5>``` , the bindings can expire the cache and reload updated version before next request. If the server does not send the hashes, the cache does not expire and has to be deleted manually when necessary.
+The bindings cache the apidoc from the server. It has separated caches for each server it connects to. If the server sends the apipie checksum in the headers ```Apipie-Checksum: <md5>``` , the bindings can expire the cache and reload updated version before next request. If the server does not send the hashes, the cache does not expire and has to be deleted manually when necessary.
 
-Sample patch for the server can be found here https://github.com/mbacovsky/foreman/commit/d35d76b9032bb3d3de2da7fb1dc780600eb08bdd
+The ability to send checksums comes with Apipie 0.1.1, see the [docs](https://github.com/Apipie/apipie-rails#json-checksums) on how to set it up.
 
 #### API introspection
 It is possible to list available resources, actions, params, routes and its attributes
@@ -18,63 +18,67 @@ It is possible to list available resources, actions, params, routes and its attr
 ```
 $ rake install
 $ irb
-irb(main):003:0> require 'apipie-bindings'
+irb> require 'apipie-bindings'
 
-irb(main):001:0> api = ApipieBindings::API.new({:uri => 'http://localhost:3000/', :username => 'admin', :password => :changeme})
+irb> api = ApipieBindings::API.new({:uri => 'http://localhost:3000/', :username => 'admin', :password => :changeme})
 ```
 
 ##### Listing resources
 
 ```
-irb(main):005:0> api.resources
+irb> api.resources
 => [<Resource :roles>, <Resource :images>, <Resource :reports>, <Resource :hosts>, .... <Resource :architectures>]
 ```
 
 ##### Listing actions
 
 ```
-irb(main):006:0> api.resource(:architectures).actions
+irb> api.resource(:architectures).actions
 => [<Action :index>, <Action :show>, <Action :create>, <Action :update>, <Action :destroy>]
 ```
 
 ##### Listing routes
 ```
-irb(main):008:0> api.resource(:architectures).action(:show).routes
+irb> api.resource(:architectures).action(:show).routes
 => [<Route /api/architectures/:id>]
 ```
 
 ##### Listing params
 
 ```
-irb(main):007:0> api.resource(:architectures).action(:show).params
+irb> api.resource(:architectures).action(:show).params
 => [<Param *id (String)>]
 
 
-irb(main):009:0> api.resource(:architectures).action(:show).params.first.required?
+irb> api.resource(:architectures).action(:show).params.first.required?
 => true
 ```
 
 ##### Calling methods (all the calls bellow are equivalent)
 
 ```
-irb(main):012:0> api.resource(:architectures).call(:show, :id => 1)
+irb> api.resource(:architectures).call(:show, :id => 1)
 => {"name"=>"x86_64", "id"=>1, "created_at"=>"2013-12-03T15:00:08Z", "updated_at"=>"2013-12-03T15:00:08Z"}
 
-irb(main):013:0> api.call(:architectures, :show, :id => 1)
+irb> api.call(:architectures, :show, :id => 1)
 => {"name"=>"x86_64", "id"=>1, "created_at"=>"2013-12-03T15:00:08Z", "updated_at"=>"2013-12-03T15:00:08Z"}
 
-irb(main):014:0> api.resource(:architectures).action(:show).call(:id => 1)
+irb> api.resource(:architectures).action(:show).call(:id => 1)
 => {"name"=>"x86_64", "id"=>1, "created_at"=>"2013-12-03T15:00:08Z", "updated_at"=>"2013-12-03T15:00:08Z"}
 
 ```
 
+Documentation
+-------------
+there is not much of the library documented yet, but we started to document our API with Yard.
+The docs are installed with the gem and can be viewed from the docs dir directly or by running
+```yard server --gems``` or **online** on [rubydoc.info](http://rubydoc.info/github/Apipie/apipie-bindings/)
+
+
 TODO
 ----
 * parameter validation
-* better configurability
-* error handling
-* logging
-* lots of other things
+* update docs
 
 
 License
