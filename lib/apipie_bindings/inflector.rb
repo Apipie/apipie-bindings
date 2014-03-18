@@ -126,11 +126,12 @@ module ApipieBindings
     inflect.singular(/([^aeiouy])ies$/i, '\1y')
 
     inflect.irregular('child', 'children')
+    inflect.irregular('man', 'men')
+    inflect.irregular('medium', 'media')
+    inflect.irregular('move', 'moves')
     inflect.irregular('person', 'people')
     inflect.irregular('self', 'selves')
-    inflect.irregular('man', 'men')
     inflect.irregular('sex', 'sexes')
-    inflect.irregular('move', 'moves')
 
     inflect.uncountable(%w(equipment information money species series fish sheep police))
   end
