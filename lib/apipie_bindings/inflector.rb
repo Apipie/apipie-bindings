@@ -36,10 +36,10 @@ module ApipieBindings
       @uncountables.delete(singular)
       @uncountables.delete(plural)
 
-      s0 = singular[0]
+      s0 = singular[0].chr
       srest = singular[1..-1]
 
-      p0 = plural[0]
+      p0 = plural[0].chr
       prest = plural[1..-1]
 
       if s0.upcase == p0.upcase
