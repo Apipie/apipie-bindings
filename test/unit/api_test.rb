@@ -59,6 +59,16 @@ describe ApipieBindings::API do
     result.must_be_kind_of Array
   end
 
+  it "should preserve file in args (#2)" do
+    api = ApipieBindings::API.new({
+      :apidoc_cache_dir => 'test/unit/data',
+      :apidoc_cache_name => 'architecture',
+      :dry_run => true})
+    s = StringIO.new; s << 'foo'
+    RestClient::Response.expects(:create).with('', 200, [:post, {:file => s}, {}])
+    result = api.http_call(:post, '/api/path', {:file => s}, {}, {:response => :raw})
+  end
+
   context "update_cache" do
 
     before :each do

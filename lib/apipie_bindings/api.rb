@@ -135,6 +135,22 @@ module ApipieBindings
       apidoc[:docs][:resources].keys.map { |res| resource(res) }
     end
 
+
+    # Call an action in the API.
+    # It finds most fitting route based on given parameters
+    # with other attributes neccessary to do an API call.
+    # If in dry_run mode {#initialize} it finds fake response data in examples
+    # or user provided data. At the end when the response format is JSON it
+    # is parsed and returned as ruby objects. If server supports checksum sending
+    # the internal cache with API description is checked and updated if needed
+    # @param [Symbol] resource_name name of the resource
+    # @param [Symbol] action_name name of the action
+    # @param [Hash] params parameters to be send in the request
+    # @param [Hash] headers extra headers to be sent with the request
+    # @param [Hash] options options to influence the how the call is processed
+    #   * *:response* (Symbol) *:raw* - skip parsing JSON in response
+    # @example show user data
+    #   call(:users, :show, :id => 1)
     def call(resource_name, action_name, params={}, headers={}, options={})
       check_cache if @aggressive_cache_checking
       resource = resource(resource_name)
@@ -149,13 +165,22 @@ module ApipieBindings
         headers, options)
     end
 
-
+    # Low level call to the API. Suitable for calling actions not covered by
+    # apipie documentation. For all other cases use {#call}
+    # @param [String] http_method one of +get+, +put+, +post+, +destroy+, +patch+
+    # @param [String] path URL path that should be called
+    # @param [Hash] params parameters to be send in the request
+    # @param [Hash] headers extra headers to be sent with the request
+    # @param [Hash] options options to influence the how the call is processed
+    #   * *:response* (Symbol) *:raw* - skip parsing JSON in response
+    # @example show user data
+    #   http_call('get', '/api/users/1')
     def http_call(http_method, path, params={}, headers={}, options={})
       headers ||= { }
 
       args = [http_method]
       if %w[post put].include?(http_method.to_s)
-        args << params.to_json
+        args << params
       else
         headers[:params] = params if params
       end
@@ -168,7 +193,7 @@ module ApipieBindings
       if dry_run?
         empty_response = ApipieBindings::Example.new('', '', '', 200, '')
         ex = options[:fake_response ] || empty_response
-        response = RestClient::Response.create(ex.response, ex.status, ex.args)
+        response = RestClient::Response.create(ex.response, ex.status, args)
       else
         response = @client[path].send(*args)
         update_cache(response.headers[:apipie_checksum])
