@@ -116,4 +116,10 @@ describe ApipieBindings::API do
     end
   end
 
+  context "configuration" do
+    it "should complain when no uri or cache dir is set" do
+      proc {ApipieBindings::API.new({})}.must_raise ApipieBindings::ConfigurationError
+    end
+  end
+
 end

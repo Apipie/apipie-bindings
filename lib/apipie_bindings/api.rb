@@ -36,6 +36,7 @@ module ApipieBindings
     #   *after* each API request
     # @option config [Object] :logger (Logger.new(STDERR)) custom logger class
     # @param [Hash] options params that are passed to ResClient as-is
+    # @raise [ApipieBindings::ConfigurationError] when no +:uri+ or +:apidoc_cache_dir+ is provided
     # @example connect to a server
     #   ApipieBindings::API.new({:uri => 'http://localhost:3000/',
     #     :username => 'admin', :password => 'changeme',
@@ -44,6 +45,9 @@ module ApipieBindings
     #   ApipieBindings::API.new({:apidoc_cache_dir => 'test/unit/data',
     #     :apidoc_cache_name => 'architecture'})
     def initialize(config, options={})
+      if config[:uri].nil? && config[:apidoc_cache_dir].nil?
+        raise ApipieBindings::ConfigurationError.new('Either :uri or :apidoc_cache_dir needs to be set')
+      end
       @uri = config[:uri]
       @api_version = config[:api_version] || 1
       @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join(Dir.tmpdir, 'apipie_bindings', @uri.tr(':/', '_'))
