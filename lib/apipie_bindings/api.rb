@@ -102,19 +102,6 @@ module ApipieBindings
       end
     end
 
-    def retrieve_apidoc
-      FileUtils.mkdir_p(@apidoc_cache_dir) unless File.exists?(@apidoc_cache_dir)
-      path = "/apidoc/v#{@api_version}.json"
-      begin
-        response = http_call('get', path, {},
-          {:accept => "application/json"}, {:response => :raw})
-      rescue
-        raise "Could not load data from #{@uri}#{path}"
-      end
-      File.open(apidoc_cache_file, "w") { |f| f.write(response.body) }
-      log.debug "New apidoc loaded from the server"
-      load_apidoc
-    end
 
     def apidoc
       @apidoc = @apidoc || load_apidoc || retrieve_apidoc
@@ -245,6 +232,23 @@ module ApipieBindings
     end
 
     private
+
+    def retrieve_apidoc
+      FileUtils.mkdir_p(@apidoc_cache_dir) unless File.exists?(@apidoc_cache_dir)
+      path = "/apidoc/v#{@api_version}.json"
+      begin
+        response = http_call('get', path, {},
+          {:accept => "application/json"}, {:response => :raw})
+      rescue
+        raise ApipieBindings::DocLoadingError.new(
+          "Could not load data from #{@uri}#{path}\n"\
+          " - is your server down?\n"\
+          " - was rake apipie:cache run when using apipie cache? (typical production settings)")
+      end
+      File.open(apidoc_cache_file, "w") { |f| f.write(response.body) }
+      log.debug "New apidoc loaded from the server"
+      load_apidoc
+    end
 
     def find_match(fakes, resource, action, params)
       resource = fakes[[resource, action]]
