@@ -35,6 +35,7 @@ module ApipieBindings
     #   if the local cache of API description (JSON) is up to date. By default it is checked
     #   *after* each API request
     # @option config [Object] :logger (Logger.new(STDERR)) custom logger class
+    # @option config [Number] :timeout API request timeout in seconds
     # @param [Hash] options params that are passed to ResClient as-is
     # @raise [ApipieBindings::ConfigurationError] when no +:uri+ or +:apidoc_cache_dir+ is provided
     # @example connect to a server
@@ -75,6 +76,7 @@ module ApipieBindings
         :user     => config[:username],
         :password => config[:password],
         :oauth    => config[:oauth],
+        :timeout  => config[:timeout],
         :headers  => headers
       }.merge(options)
 
