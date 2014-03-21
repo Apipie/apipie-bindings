@@ -65,8 +65,9 @@ describe ApipieBindings::API do
       :apidoc_cache_name => 'architecture',
       :dry_run => true})
     s = StringIO.new; s << 'foo'
-    RestClient::Response.expects(:create).with('', 200, [:post, {:file => s}, {}])
-    result = api.http_call(:post, '/api/path', {:file => s}, {}, {:response => :raw})
+    headers = {:content_type => 'multipart/form-data', :multipart => true}
+    RestClient::Response.expects(:create).with('', 200, [:post, {:file => s}, headers])
+    result = api.http_call(:post, '/api/path', {:file => s}, headers, {:response => :raw})
   end
 
   context "update_cache" do
