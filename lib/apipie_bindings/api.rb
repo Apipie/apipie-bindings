@@ -166,6 +166,7 @@ module ApipieBindings
     # @param [Hash] headers extra headers to be sent with the request
     # @param [Hash] options options to influence the how the call is processed
     #   * *:response* (Symbol) *:raw* - skip parsing JSON in response
+    #   * *:reduce_response_log* (Bool) - do not show response content in the log.
     # @example show user data
     #   http_call('get', '/api/users/1')
     def http_call(http_method, path, params={}, headers={}, options={})
@@ -198,7 +199,7 @@ module ApipieBindings
       end
 
       result = options[:response] == :raw ? response : process_data(response)
-      log.debug "Response #{result.ai}"
+      log.debug "Response %s" % (options[:reduce_response_log] ? "Received OK" : result.ai)
       result
     end
 
@@ -245,7 +246,7 @@ module ApipieBindings
       path = "/apidoc/v#{@api_version}.json"
       begin
         response = http_call('get', path, {},
-          {:accept => "application/json"}, {:response => :raw})
+          {:accept => "application/json"}, {:response => :raw, :reduce_response_log => true})
       rescue
         raise ApipieBindings::DocLoadingError.new(
           "Could not load data from #{@uri}#{path}\n"\
