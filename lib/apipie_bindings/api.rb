@@ -9,7 +9,7 @@ module ApipieBindings
 
   class API
 
-    attr_reader :apidoc_cache_name, :fake_responses
+    attr_reader :apidoc_cache_name, :fake_responses, :language
     attr_writer :dry_run
 
     # Creates new API bindings instance
@@ -23,6 +23,7 @@ module ApipieBindings
     #   * *:options* (Hash) options passed to OAuth
     # @option config [Hash] :headers additional headers to send with the requests
     # @option config [String] :api_version ('1') version of the API
+    # @option config [String] :language prefered locale for the API description
     # @option config [String] :apidoc_cache_dir ('/tmp/apipie_bindings/<URI>') where
     #   to cache the JSON description of the API
     # @option config [String] :apidoc_cache_name ('default.json') name of te cache file.
@@ -51,12 +52,12 @@ module ApipieBindings
       end
       @uri = config[:uri]
       @api_version = config[:api_version] || 1
+      @language = config[:language]
       @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join(Dir.tmpdir, 'apipie_bindings', @uri.tr(':/', '_'))
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
       @dry_run = config[:dry_run] || false
       @aggressive_cache_checking = config[:aggressive_cache_checking] || false
       @fake_responses = config[:fake_responses] || {}
-
       @logger = config[:logger]
       unless @logger
         @logger = Logger.new(STDERR)
@@ -69,6 +70,7 @@ module ApipieBindings
         :content_type => 'application/json',
         :accept       => "application/json;version=#{@api_version}"
       }
+      headers.merge!({ "Accept-Language" => language }) if language
       headers.merge!(config[:headers]) unless config[:headers].nil?
       headers.merge!(options.delete(:headers)) unless options[:headers].nil?
 
@@ -84,17 +86,9 @@ module ApipieBindings
       @config = config
     end
 
-    def set_default_name(default='default')
-      cache_file = Dir["#{@apidoc_cache_dir}/*.json"].first
-      if cache_file
-        File.basename(cache_file, ".json")
-      else
-        default
-      end
-    end
 
     def apidoc_cache_file
-       File.join(@apidoc_cache_dir, "#{@apidoc_cache_name}.json")
+       File.join(@apidoc_cache_dir, "#{@apidoc_cache_name}#{cache_extension}")
     end
 
     def load_apidoc
@@ -203,15 +197,6 @@ module ApipieBindings
       result
     end
 
-    def process_data(response)
-      data = begin
-               JSON.parse(response.body)
-             rescue JSON::ParserError
-               response.body
-             end
-      # logger.debug "Returned data: #{data.inspect}"
-      return data
-    end
 
     def update_cache(cache_name)
       if !cache_name.nil? && (cache_name != @apidoc_cache_name)
@@ -223,7 +208,7 @@ module ApipieBindings
 
     def clean_cache
       @apidoc = nil
-      Dir["#{@apidoc_cache_dir}/*.json"].each { |f| File.delete(f) }
+      Dir["#{@apidoc_cache_dir}/*#{cache_extension}"].each { |f| File.delete(f) }
     end
 
     def check_cache
@@ -243,19 +228,35 @@ module ApipieBindings
 
     def retrieve_apidoc
       FileUtils.mkdir_p(@apidoc_cache_dir) unless File.exists?(@apidoc_cache_dir)
-      path = "/apidoc/v#{@api_version}.json"
-      begin
-        response = http_call('get', path, {},
-          {:accept => "application/json"}, {:response => :raw, :reduce_response_log => true})
-      rescue
-        raise ApipieBindings::DocLoadingError.new(
-          "Could not load data from #{@uri}#{path}\n"\
-          " - is your server down?\n"\
-          " - was rake apipie:cache run when using apipie cache? (typical production settings)")
+      if language
+        response = retrieve_apidoc_call("/apidoc/v#{@api_version}.#{language}.json", :safe => true)
+        language_family = language.split('_').first
+        if !response && language_family != language
+          response = retrieve_apidoc_call("/apidoc/v#{@api_version}.#{language_family}.json", :safe => true)
+        end
+      end
+      unless response
+        begin
+          response = retrieve_apidoc_call("/apidoc/v#{@api_version}.json")
+        rescue
+          raise ApipieBindings::DocLoadingError.new(
+            "Could not load data from #{@uri}\n"\
+            " - is your server down?\n"\
+            " - was rake apipie:cache run when using apipie cache? (typical production settings)")
+        end
       end
       File.open(apidoc_cache_file, "w") { |f| f.write(response.body) }
       log.debug "New apidoc loaded from the server"
       load_apidoc
+    end
+
+    def retrieve_apidoc_call(path, options={})
+      begin
+        http_call('get', path, {},
+          {:accept => "application/json"}, {:response => :raw, :reduce_response_log => true})
+      rescue
+        raise unless options[:safe]
+      end
     end
 
     def find_match(fakes, resource, action, params)
@@ -270,6 +271,28 @@ module ApipieBindings
       return nil
     end
 
+    def cache_extension
+      language ? ".#{language}.json" : ".json"
+    end
+
+    def set_default_name(default='default')
+      cache_file = Dir["#{@apidoc_cache_dir}/*#{cache_extension}"].first
+      if cache_file
+        File.basename(cache_file, cache_extension)
+      else
+        default
+      end
+    end
+
+    def process_data(response)
+      data = begin
+               JSON.parse(response.body)
+             rescue JSON::ParserError
+               response.body
+             end
+      # logger.debug "Returned data: #{data.inspect}"
+      return data
+    end
   end
 
 end
