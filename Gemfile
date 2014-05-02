@@ -3,7 +3,7 @@ source "http://rubygems.org"
 gemspec
 
 group :test do
-  gem 'rake'
+  gem 'rake', '~> 10.1.0'
   gem 'thor'
   gem 'minitest', '4.7.4'
   gem 'minitest-spec-context'
