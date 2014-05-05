@@ -24,7 +24,7 @@ module ApipieBindings
     # @option config [Hash] :headers additional headers to send with the requests
     # @option config [String] :api_version ('1') version of the API
     # @option config [String] :language prefered locale for the API description
-    # @option config [String] :apidoc_cache_dir ('/tmp/apipie_bindings/<URI>') where
+    # @option config [String] :apidoc_cache_dir ('~/.cache/apipie_bindings/<URI>') where
     #   to cache the JSON description of the API
     # @option config [String] :apidoc_cache_name ('default.json') name of te cache file.
     #   If there is cache in the :apidoc_cache_dir, it is used.
@@ -53,7 +53,7 @@ module ApipieBindings
       @uri = config[:uri]
       @api_version = config[:api_version] || 1
       @language = config[:language]
-      @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join(Dir.tmpdir, 'apipie_bindings', @uri.tr(':/', '_'))
+      @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join(File.expand_path('~/.cache'), 'apipie_bindings', @uri.tr(':/', '_'))
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
       @dry_run = config[:dry_run] || false
       @aggressive_cache_checking = config[:aggressive_cache_checking] || false
