@@ -23,7 +23,7 @@ EOF
   s.has_rdoc         = 'yard'
   s.require_paths    = ["lib"]
 
-  s.add_dependency 'json'
+  s.add_dependency 'json', '>= 1.2.1'
   s.add_dependency 'rest-client', '>= 1.6.1'
   s.add_dependency 'oauth'
   s.add_dependency 'awesome_print'
