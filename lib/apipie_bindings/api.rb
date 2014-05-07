@@ -295,11 +295,10 @@ module ApipieBindings
 
     def process_data(response)
       data = begin
-               JSON.parse(response.body)
+               JSON.parse((response.respond_to?(:body) ? response.body : response) || '')
              rescue JSON::ParserError
-               response.body
+               response.respond_to?(:body) ? response.body : response || ''
              end
-      # logger.debug "Returned data: #{data.inspect}"
       return data
     end
   end

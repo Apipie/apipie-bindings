@@ -70,6 +70,22 @@ describe ApipieBindings::API do
     result = api.http_call(:post, '/api/path', {:file => s}, headers, {:response => :raw})
   end
 
+  it "should process nil response safely" do
+    api.send(:process_data, nil).must_equal ''
+  end
+
+  it "should process empty response safely" do
+    api.send(:process_data, '').must_equal ''
+  end
+
+  it "should process empty JSON response safely" do
+    api.send(:process_data, '{}').must_equal({})
+  end
+
+  it "should process JSON response safely" do
+    api.send(:process_data, '{"a" : []}').must_equal({'a' => []})
+  end
+
   context "update_cache" do
 
     before :each do
