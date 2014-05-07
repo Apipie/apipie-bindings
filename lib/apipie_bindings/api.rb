@@ -74,6 +74,8 @@ module ApipieBindings
       headers.merge!(config[:headers]) unless config[:headers].nil?
       headers.merge!(options.delete(:headers)) unless options[:headers].nil?
 
+      log.debug "Global headers: #{headers.ai}"
+
       resource_config = {
         :user     => config[:username],
         :password => config[:password],
@@ -180,6 +182,7 @@ module ApipieBindings
 
       log.info "#{http_method.to_s.upcase} #{path}"
       log.debug "Params: #{params.ai}"
+      log.debug "Headers: #{headers.ai}"
 
       args << headers if headers
 
@@ -188,8 +191,14 @@ module ApipieBindings
         ex = options[:fake_response ] || empty_response
         response = RestClient::Response.create(ex.response, ex.status, args)
       else
-        response = @client[path].send(*args)
-        update_cache(response.headers[:apipie_checksum])
+        begin
+          response = @client[path].send(*args)
+          update_cache(response.headers[:apipie_checksum])
+        rescue => e
+          log.error e.message + "\n" +
+            (e.respond_to?(:response) ? process_data(e.response).ai : e.ai)
+          raise
+        end
       end
 
       result = options[:response] == :raw ? response : process_data(response)
