@@ -202,7 +202,8 @@ module ApipieBindings
       end
 
       result = options[:response] == :raw ? response : process_data(response)
-      log.debug "Response %s" % (options[:reduce_response_log] ? "Received OK" : result.ai)
+      log.debug "Response: %s" % (options[:reduce_response_log] ? "Received OK" : result.ai)
+      log.debug "Response headers: #{response.headers.ai}"
       result
     end
 
