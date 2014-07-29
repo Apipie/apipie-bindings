@@ -6,7 +6,7 @@ describe ApipieBindings::Resource do
     :apidoc_cache_name => 'architecture'}).resource(:architectures) }
 
   it "should list actions" do
-    resource.actions.map(&:name).must_equal [:index, :show, :create]
+    resource.actions.map(&:name).must_equal [:index, :show, :create, :create_unnested]
   end
 
   it "should test action existence" do

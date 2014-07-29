@@ -145,6 +145,44 @@
                             }
                         ],
                         "see": []
+                    },
+                    {
+                        "apis": [
+                            {
+                                "api_url": "/api/architectures",
+                                "http_method": "POST",
+                                "short_description": "create an architecture."
+                            }
+                        ],
+                        "doc_url": "/apidoc/v2/architectures/create",
+                        "errors": [],
+                        "examples" : [
+                            "same as nested create"
+                        ],
+                        "formats": null,
+                        "full_description": "",
+                        "name": "create_unnested",
+                        "params":[
+                            {
+                                "allow_nil": false,
+                                "description": "",
+                                "expected_type": "string",
+                                "full_name": "architecture[name]",
+                                "name": "name",
+                                "required": true,
+                                "validator": "Must be String"
+                            },
+                            {
+                                "allow_nil": false,
+                                "description": "\n<p>Operatingsystem ID\u2019s</p>\n",
+                                "expected_type": "array",
+                                "full_name": "architecture[operatingsystem_ids]",
+                                "name": "operatingsystem_ids",
+                                "required": false,
+                                "validator": "Must be Array"
+                            }
+                        ],
+                        "see": []
                     }
                 ]
             }
