@@ -24,7 +24,7 @@ EOF
   s.require_paths    = ["lib"]
 
   s.add_dependency 'json', '>= 1.2.1'
-  s.add_dependency 'rest-client', '>= 1.6.1'
+  s.add_dependency 'rest-client', '>= 1.6.5', '< 1.7' # lower versions don't allow setting infinite timeouts, higher versions are not ruby 1.8 compatible
   s.add_dependency 'oauth'
   s.add_dependency 'awesome_print'
   s.add_dependency 'mime-types', '~> 1.0'  #newer versions of mime-types are not 1.8 compatible

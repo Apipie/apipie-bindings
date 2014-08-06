@@ -189,7 +189,8 @@ module ApipieBindings
       if dry_run?
         empty_response = ApipieBindings::Example.new('', '', '', 200, '')
         ex = options[:fake_response ] || empty_response
-        response = RestClient::Response.create(ex.response, ex.status, args)
+        net_http_resp = Net::HTTPResponse.new(1.0, ex.status, "")
+        response = RestClient::Response.create(ex.response, net_http_resp, args)
       else
         begin
           response = @client[path].send(*args)
@@ -203,7 +204,7 @@ module ApipieBindings
 
       result = options[:response] == :raw ? response : process_data(response)
       log.debug "Response: %s" % (options[:reduce_response_log] ? "Received OK" : result.ai)
-      log.debug "Response headers: #{response.headers.ai}"
+      log.debug "Response headers: #{response.headers.ai}" if response.respond_to?(:headers)
       result
     end
 

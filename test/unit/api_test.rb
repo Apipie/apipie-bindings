@@ -66,7 +66,9 @@ describe ApipieBindings::API do
       :dry_run => true})
     s = StringIO.new; s << 'foo'
     headers = {:content_type => 'multipart/form-data', :multipart => true}
-    RestClient::Response.expects(:create).with('', 200, [:post, {:file => s}, headers])
+    RestClient::Response.expects(:create).with() {
+      |body, head, args| args == [:post, {:file => s}, headers]
+    }
     result = api.http_call(:post, '/api/path', {:file => s}, headers, {:response => :raw})
   end
 
