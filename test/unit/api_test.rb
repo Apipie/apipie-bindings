@@ -66,7 +66,9 @@ describe ApipieBindings::API do
       :dry_run => true})
     s = StringIO.new; s << 'foo'
     headers = {:content_type => 'multipart/form-data', :multipart => true}
-    RestClient::Response.expects(:create).with('', 200, [:post, {:file => s}, headers])
+    RestClient::Response.expects(:create).with() {
+      |body, head, args| args == [:post, {:file => s}, headers]
+    }
     result = api.http_call(:post, '/api/path', {:file => s}, headers, {:response => :raw})
   end
 
@@ -127,9 +129,10 @@ describe ApipieBindings::API do
     end
 
     it "should load cache and its name from cache dir" do
+      Dir["#{@dir}/*"].each { |f| File.delete(f) }
       FileUtils.cp('test/unit/data/architecture.json', File.join(@dir, 'api_cache.json'))
-      @api = ApipieBindings::API.new({:apidoc_cache_dir => @dir})
-      @api.apidoc_cache_name.must_equal 'api_cache'
+      api = ApipieBindings::API.new({:apidoc_cache_dir => @dir})
+      api.apidoc_cache_name.must_equal 'api_cache'
     end
   end
 
