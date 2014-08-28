@@ -199,7 +199,7 @@ module ApipieBindings
           response = @client[path].send(*args)
           update_cache(response.headers[:apipie_checksum])
         rescue => e
-          log.error e.message + "\n" +
+          log.debug e.message + "\n" +
             (e.respond_to?(:response) ? process_data(e.response).ai : e.ai)
           raise
         end
