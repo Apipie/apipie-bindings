@@ -148,7 +148,7 @@ module ApipieBindings
       resource = resource(resource_name)
       action = resource.action(action_name)
       route = action.find_route(params)
-      #action.validate(params)
+      action.validate!(params)
       options[:fake_response] = find_match(fake_responses, resource_name, action_name, params) || action.examples.first if dry_run?
       return http_call(
         route.method,

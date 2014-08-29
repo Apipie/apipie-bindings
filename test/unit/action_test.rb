@@ -41,8 +41,20 @@ describe ApipieBindings::Action do
     # incuded params in alphanumeric order.
 
 
-  it "should validate the params" do
-    resource.action(:create).validate!({ :architecture => { :name => 'i386' } })
+  it "should validate incorrect params" do
+    proc do
+      resource.action(:create).validate!({ :architecture => { :foo => "foo" } })
+    end.must_raise(ApipieBindings::MissingArgumentsError)
+
+    proc do
+      # completely different sub-hash; should still fail
+      resource.action(:create).validate!({ :organization => { :name => "acme" } })
+    end.must_raise(ApipieBindings::MissingArgumentsError)
+  end
+
+  it "should accept correct params" do
+    resource.action(:create).validate!({:architecture => { :name => 'i386' } })
+    resource.action(:create_unnested).validate!(:name => "i386")
   end
 
   it "should have name visible in puts" do
