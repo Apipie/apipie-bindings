@@ -10,6 +10,10 @@ module ApipieBindings
       @params = params
     end
 
+    def to_s
+      "#{super}: #{params.join(',')}"
+    end
+
   end
 
 end
