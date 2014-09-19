@@ -84,4 +84,4 @@ TODO
 License
 -------
 
-This project is licensed under the GPLv3+.
+This project is licensed under the MIT license.

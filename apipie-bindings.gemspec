@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.authors       = ["Martin Bačovský"]
   s.email         = "mbacovsk@redhat.com"
   s.homepage      = "http://github.com/Apipie/apipie-bindings"
-  s.license       = "GPL-3"
+  s.license       = "MIT"
 
   s.summary       = %q{The Ruby bindings for Apipie documented APIs}
   s.description   = <<EOF
