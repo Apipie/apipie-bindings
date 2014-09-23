@@ -42,14 +42,16 @@ describe ApipieBindings::Action do
 
 
   it "should validate incorrect params" do
-    proc do
+    e = proc do
       resource.action(:create).validate!({ :architecture => { :foo => "foo" } })
     end.must_raise(ApipieBindings::MissingArgumentsError)
+    e.message.must_match /: name$/
 
-    proc do
+    e = proc do
       # completely different sub-hash; should still fail
       resource.action(:create).validate!({ :organization => { :name => "acme" } })
     end.must_raise(ApipieBindings::MissingArgumentsError)
+    e.message.must_match /: name$/
   end
 
   it "should accept correct params" do
