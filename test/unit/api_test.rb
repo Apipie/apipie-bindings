@@ -143,8 +143,8 @@ describe ApipieBindings::API do
 
     it "should obey :apidoc_cache_base_dir to generate apidoc_cache_dir" do
       Dir.mktmpdir do |dir|
-        api = ApipieBindings::API.new({:uri => 'http://example.com', :apidoc_cache_base_dir => dir})
-        api.apidoc_cache_file.must_equal File.join(dir, 'http___example.com', 'default.json')
+        api = ApipieBindings::API.new({:uri => 'http://example.com', :apidoc_cache_base_dir => dir, :api_version => 2})
+        api.apidoc_cache_file.must_equal File.join(dir, 'http___example.com', 'v2', 'default.json')
       end
     end
   end
