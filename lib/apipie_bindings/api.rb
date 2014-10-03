@@ -56,7 +56,7 @@ module ApipieBindings
       @api_version = config[:api_version] || 1
       @language = config[:language]
       apidoc_cache_base_dir = config[:apidoc_cache_base_dir] || File.join(File.expand_path('~/.cache'), 'apipie_bindings')
-      @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join(apidoc_cache_base_dir, @uri.tr(':/', '_'))
+      @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join(apidoc_cache_base_dir, @uri.tr(':/', '_'), "v#{@api_version}")
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
       @dry_run = config[:dry_run] || false
       @aggressive_cache_checking = config[:aggressive_cache_checking] || false
