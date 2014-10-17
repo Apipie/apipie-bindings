@@ -21,6 +21,10 @@ module ApipieBindings
     #   * *:consumer_key* (String) OAuth key
     #   * *:consumer_secret* (String) OAuth secret
     #   * *:options* (Hash) options passed to OAuth
+    # @option config [AbstractCredentials] :credentials object implementing {AbstractCredentials}
+    #   interface e.g. {https://github.com/theforeman/hammer-cli-foreman/blob/master/lib/hammer_cli_foreman/credentials.rb HammerCLIForeman::BasicCredentials}
+    #   This is prefered way to pass credentials. Credentials acquired form :credentials object take
+    #   precedence over explicite params
     # @option config [Hash] :headers additional headers to send with the requests
     # @option config [String] :api_version ('1') version of the API
     # @option config [String] :language prefered locale for the API description
@@ -30,6 +34,9 @@ module ApipieBindings
     #   to cache the JSON description of the API
     # @option config [String] :apidoc_cache_name ('default.json') name of te cache file.
     #   If there is cache in the :apidoc_cache_dir, it is used.
+    # @option config [String] :apidoc_authenticated (true) whether or not does the call to
+    #   obtain API description use authentication. It is useful to avoid unnecessary prompts
+    #   for credentials
     # @option config [Hash] :fake_responses ({}) responses to return if used in dry run mode
     # @option config [Bool] :dry_run (false) dry run mode allows to test your scripts
     #   and not touch the API. The results are taken form exemples in the API description
@@ -58,6 +65,7 @@ module ApipieBindings
       apidoc_cache_base_dir = config[:apidoc_cache_base_dir] || File.join(File.expand_path('~/.cache'), 'apipie_bindings')
       @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join(apidoc_cache_base_dir, @uri.tr(':/', '_'), "v#{@api_version}")
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
+      @apidoc_authenticated = (config[:apidoc_authenticated].nil? ? true : config[:apidoc_authenticated])
       @dry_run = config[:dry_run] || false
       @aggressive_cache_checking = config[:aggressive_cache_checking] || false
       @fake_responses = config[:fake_responses] || {}
@@ -79,15 +87,13 @@ module ApipieBindings
 
       log.debug "Global headers: #{headers.ai}"
 
-      resource_config = {
-        :user     => config[:username],
-        :password => config[:password],
-        :oauth    => config[:oauth],
+      @credentials = config[:credentials] if config[:credentials] && config[:credentials].respond_to?(:to_params)
+
+      @resource_config = {
         :timeout  => config[:timeout],
         :headers  => headers
       }.merge(options)
 
-      @client = RestClient::Resource.new(config[:uri], resource_config)
       @config = config
     end
 
@@ -141,6 +147,7 @@ module ApipieBindings
     # @param [Hash] headers extra headers to be sent with the request
     # @param [Hash] options options to influence the how the call is processed
     #   * *:response* (Symbol) *:raw* - skip parsing JSON in response
+    #   * *:with_authentication* (Bool) *true* - use rest client with/without auth configuration
     # @example show user data
     #   call(:users, :show, :id => 1)
     def call(resource_name, action_name, params={}, headers={}, options={})
@@ -166,6 +173,7 @@ module ApipieBindings
     # @param [Hash] options options to influence the how the call is processed
     #   * *:response* (Symbol) *:raw* - skip parsing JSON in response
     #   * *:reduce_response_log* (Bool) - do not show response content in the log.
+    #   * *:with_authentication* (Bool) *true* - use rest client with/without auth configuration
     # @example show user data
     #   http_call('get', '/api/users/1')
     def http_call(http_method, path, params={}, headers={}, options={})
@@ -196,7 +204,10 @@ module ApipieBindings
         response = RestClient::Response.create(ex.response, net_http_resp, args)
       else
         begin
-          response = @client[path].send(*args)
+          apidoc_without_auth = (path =~ /\/apidoc\//) && !@apidoc_authenticated
+          authenticate = options[:with_authentication].nil? ? !apidoc_without_auth : options[:with_authentication]
+          client = authenticate ? authenticated_client : unauthenticated_client
+          response = call_client(client, path, args)
           update_cache(response.headers[:apipie_checksum])
         rescue => e
           log.debug e.message + "\n" +
@@ -227,18 +238,12 @@ module ApipieBindings
 
     def check_cache
       begin
-        response = http_call('get', "/apidoc/apipie_checksum", {}, {:accept => "application/json"})
+        response = http_call('get', "/apidoc/apipie_checksum", {}, { :accept => "application/json" })
         response['checksum']
       rescue
         nil
       end
     end
-
-    def log
-      @logger
-    end
-
-    private
 
     def retrieve_apidoc
       FileUtils.mkdir_p(@apidoc_cache_dir) unless File.exists?(@apidoc_cache_dir)
@@ -262,6 +267,33 @@ module ApipieBindings
       File.open(apidoc_cache_file, "w") { |f| f.write(response.body) }
       log.debug "New apidoc loaded from the server"
       load_apidoc
+    end
+
+    def log
+      @logger
+    end
+
+    private
+
+    def call_client(client, path, args)
+      client[path].send(*args)
+    end
+
+    def authenticated_client
+      unless @client_with_auth
+        resource_config = @resource_config.merge({
+          :user     => @config[:username],
+          :password => @config[:password],
+          :oauth    => @config[:oauth],
+        })
+        resource_config.merge!(@credentials.to_params) if @credentials
+        @client_with_auth = RestClient::Resource.new(@config[:uri], resource_config)
+      end
+      @client_with_auth
+    end
+
+    def unauthenticated_client
+      @client_without_auth ||= RestClient::Resource.new(@config[:uri], @resource_config)
     end
 
     def retrieve_apidoc_call(path, options={})
