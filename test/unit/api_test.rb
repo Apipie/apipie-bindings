@@ -17,9 +17,6 @@ describe ApipieBindings::API do
     api.resources.map(&:name).must_equal [:architectures]
   end
 
-  # it "should have apidoc_cache_file available" do
-  # end
-
   it "should call the method" do
     params = { :a => 1 }
     headers = { :content_type => 'application/json' }
@@ -145,6 +142,52 @@ describe ApipieBindings::API do
       Dir.mktmpdir do |dir|
         api = ApipieBindings::API.new({:uri => 'http://example.com', :apidoc_cache_base_dir => dir, :api_version => 2})
         api.apidoc_cache_file.must_equal File.join(dir, 'http___example.com', 'v2', 'default.json')
+      end
+    end
+  end
+
+  context "credentials" do
+
+    let(:fake_empty_response) {
+      data = ApipieBindings::Example.new('', '', '', 200, '[]')
+      net_http_resp = Net::HTTPResponse.new(1.0, data.status, "")
+      RestClient::Response.create(data.response, net_http_resp, {})
+    }
+
+    it "should call credentials to_param when :credentials are set and doing authenticated call" do
+      Dir.mktmpdir do |dir|
+        credentials = ApipieBindings::AbstractCredentials.new
+        api = ApipieBindings::API.new({
+          :uri => 'http://example.com', :apidoc_cache_base_dir => dir, :api_version => 2,
+          :credentials => credentials})
+        credentials.expects(:to_params).returns({:password => 'xxx'})
+        api.stubs(:call_client).returns(fake_empty_response)
+
+        api.http_call(:get, '/path')
+      end
+    end
+
+    it "should not require credentials for loading apidoc when :apidoc_authenticated => false" do
+      Dir.mktmpdir do |dir|
+        api = ApipieBindings::API.new({
+          :uri => 'http://example.com', :apidoc_cache_base_dir => dir, :api_version => 2,
+          :apidoc_authenticated => false })
+        api.expects(:unauthenticated_client)
+        api.stubs(:call_client).returns(fake_empty_response)
+
+        api.retrieve_apidoc
+      end
+    end
+
+    it "should not require credentials for loading checksum when :apidoc_authenticated => false" do
+      Dir.mktmpdir do |dir|
+        api = ApipieBindings::API.new({
+          :uri => 'http://example.com', :apidoc_cache_base_dir => dir, :api_version => 2,
+          :apidoc_authenticated => false })
+        api.expects(:unauthenticated_client)
+        api.stubs(:call_client).returns(fake_empty_response)
+
+        api.check_cache
       end
     end
   end
