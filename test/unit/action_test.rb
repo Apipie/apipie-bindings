@@ -3,12 +3,12 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 describe ApipieBindings::Action do
 
   let(:resource) { ApipieBindings::API.new({:apidoc_cache_dir => 'test/unit/data',
-    :apidoc_cache_name => 'architecture'}).resource(:architectures) }
+    :apidoc_cache_name => 'dummy'}).resource(:users) }
 
   it "should allow user to call the action" do
     params = { :a => 1 }
     headers = { :content_type => 'application/json' }
-    ApipieBindings::API.any_instance.expects(:call).with(:architectures, :index, params, headers, {})
+    ApipieBindings::API.any_instance.expects(:call).with(:users, :index, params, headers, {})
     resource.action(:index).call(params, headers)
   end
 
@@ -17,11 +17,11 @@ describe ApipieBindings::Action do
   end
 
   it "should find suitable route" do
-    resource.action(:index).find_route.path.must_equal "/api/architectures"
+    resource.action(:index).find_route.path.must_equal "/users"
   end
 
   it "should return params" do
-    resource.action(:create).params.map(&:name).must_equal ['architecture']
+    resource.action(:create).params.map(&:name).must_equal ['user']
   end
 
   # TODO add tests for more find_route cases
@@ -43,20 +43,20 @@ describe ApipieBindings::Action do
 
   it "should validate incorrect params" do
     e = proc do
-      resource.action(:create).validate!({ :architecture => { :foo => "foo" } })
+      resource.action(:create).validate!({ :user => { :foo => "foo" } })
     end.must_raise(ApipieBindings::MissingArgumentsError)
     e.message.must_match /: name$/
 
     e = proc do
       # completely different sub-hash; should still fail
-      resource.action(:create).validate!({ :organization => { :name => "acme" } })
+      resource.action(:create).validate!({ :apple => { :foo => "foo" } })
     end.must_raise(ApipieBindings::MissingArgumentsError)
     e.message.must_match /: name$/
   end
 
   it "should accept correct params" do
-    resource.action(:create).validate!({:architecture => { :name => 'i386' } })
-    resource.action(:create_unnested).validate!(:name => "i386")
+    resource.action(:create).validate!({:user => { :name => 'John Doe' } })
+    resource.action(:create_unnested).validate!(:name => "John Doe")
   end
 
   it "should have name visible in puts" do

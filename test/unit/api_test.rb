@@ -2,64 +2,64 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 describe ApipieBindings::API do
 
-  let(:api) { ApipieBindings::API.new({:apidoc_cache_dir => 'test/unit/data', :apidoc_cache_name => 'architecture'}) }
+  let(:api) { ApipieBindings::API.new({:apidoc_cache_dir => 'test/unit/data', :apidoc_cache_name => 'dummy'}) }
 
   it "should provide resource" do
-    result = api.resource(:architectures)
+    result = api.resource(:users)
     result.must_be_kind_of ApipieBindings::Resource
   end
 
   it "should test if resource is available" do
-    api.has_resource?(:architectures).must_equal true
+    api.has_resource?(:users).must_equal true
   end
 
   it "should list resources" do
-    api.resources.map(&:name).must_equal [:architectures]
+    api.resources.map(&:name).must_equal [:users, :comments, :posts]
   end
 
   it "should call the method" do
     params = { :a => 1 }
     headers = { :content_type => 'application/json' }
-    ApipieBindings::API.any_instance.expects(:http_call).with('get', '/api/architectures', params, headers, {})
-    api.call(:architectures, :index, params, headers)
+    ApipieBindings::API.any_instance.expects(:http_call).with('get', '/users', params, headers, {})
+    api.call(:users, :index, params, headers)
   end
 
   it "should call the method and fill in the params" do
     params = { :id => 1 }
     headers = { :content_type => 'application/json' }
-    ApipieBindings::API.any_instance.expects(:http_call).with('get', '/api/architectures/1', {}, headers, {})
-    api.call(:architectures, :show, params, headers)
+    ApipieBindings::API.any_instance.expects(:http_call).with('get', '/users/1', {}, headers, {})
+    api.call(:users, :show, params, headers)
   end
 
   it "should return values from examples in dry_run mode" do
     api.dry_run = true
-    result = api.call(:architectures, :index)
+    result = api.call(:users, :index)
     result.must_be_kind_of Array
   end
 
   it "should allow to set dry_run mode in config params" do
     api = ApipieBindings::API.new({
       :apidoc_cache_dir => 'test/unit/data',
-      :apidoc_cache_name => 'architecture',
+      :apidoc_cache_name => 'dummy',
       :dry_run => true })
-    result = api.call(:architectures, :index)
+    result = api.call(:users, :index)
     result.must_be_kind_of Array
   end
 
   it "should allow to set fake response in config params" do
     api = ApipieBindings::API.new({
       :apidoc_cache_dir => 'test/unit/data',
-      :apidoc_cache_name => 'architecture',
+      :apidoc_cache_name => 'dummy',
       :dry_run => true,
-      :fake_params => { [:architectures, :index] => {:default => [] } }} )
-    result = api.call(:architectures, :index)
+      :fake_params => { [:users, :index] => {:default => [] } }} )
+    result = api.call(:users, :index)
     result.must_be_kind_of Array
   end
 
   it "should preserve file in args (#2)" do
     api = ApipieBindings::API.new({
       :apidoc_cache_dir => 'test/unit/data',
-      :apidoc_cache_name => 'architecture',
+      :apidoc_cache_name => 'dummy',
       :dry_run => true})
     s = StringIO.new; s << 'foo'
     headers = {:content_type => 'multipart/form-data', :multipart => true}
@@ -127,7 +127,7 @@ describe ApipieBindings::API do
 
     it "should load cache and its name from cache dir" do
       Dir["#{@dir}/*"].each { |f| File.delete(f) }
-      FileUtils.cp('test/unit/data/architecture.json', File.join(@dir, 'api_cache.json'))
+      FileUtils.cp('test/unit/data/dummy.json', File.join(@dir, 'api_cache.json'))
       api = ApipieBindings::API.new({:apidoc_cache_dir => @dir})
       api.apidoc_cache_name.must_equal 'api_cache'
     end
