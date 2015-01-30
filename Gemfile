@@ -3,8 +3,8 @@ source "http://rubygems.org"
 gemspec
 
 if RUBY_VERSION < "1.9"
-gem 'rest-client', '< 1.7'
-gem 'mime-types', '~> 1.0'
+  gem 'rest-client', '< 1.7'
+  gem 'mime-types', '~> 1.0'
 end
 
 # load local gemfile
