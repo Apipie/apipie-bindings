@@ -1,0 +1,7 @@
+{
+    "post": {
+        "id": 1,
+        "title": "Hello World",
+        "body": "This is the body of the post"
+    }
+}
