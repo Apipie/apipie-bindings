@@ -14,7 +14,7 @@ describe ApipieBindings::API do
   end
 
   it "should list resources" do
-    api.resources.map(&:name).must_equal [:users, :comments, :posts]
+    api.resources.map(&:name).sort_by(&:to_s).must_equal [:comments, :posts, :users]
   end
 
   it "should call the method" do
