@@ -3,6 +3,10 @@ Gemfile.lock
 Gemfile.local
 pkg
 
+# Tags
+.tags
+.tags_sorted_by_file
+
 #Docs
 .yardoc/
 

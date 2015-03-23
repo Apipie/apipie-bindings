@@ -1,6 +1,13 @@
 Release notes
 =============
 
+### 0.0.12 (2015-03-23)
+* Add readme to the dummy app
+* Fix ordering issue in tests
+* Dummy app for testing purposes
+* Declare 1.8 dependencies in Gemfile for tests
+* Allow non-friendly 1.8 gems (Newer libraries supports IPv6)
+
 ### 0.0.11 (2014-11-09)
 * Added lazy loading of credentials ([#7408](http://projects.theforeman.org/issues/7408))
 * Separate caches for different API versions ([#18](http://github.com/Apipie/apipie-bindings/issues/18))
