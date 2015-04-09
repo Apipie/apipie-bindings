@@ -24,7 +24,8 @@ EOF
   s.require_paths    = ["lib"]
 
   s.add_dependency 'json', '>= 1.2.1'
-  s.add_dependency 'rest-client', '>= 1.6.5', '< 3.0' # lower versions don't allow setting infinite timeouts
+  s.add_dependency 'rest-client', '>= 1.6.5', '< 1.8.0' # lower versions don't allow setting infinite timeouts
+                                                        # higher versions changed params in Response object:x
   s.add_dependency 'oauth'
   s.add_dependency 'awesome_print'
 
