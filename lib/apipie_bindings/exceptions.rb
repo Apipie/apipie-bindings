@@ -3,32 +3,27 @@ module ApipieBindings
   class ConfigurationError < StandardError; end
   class DocLoadingError < StandardError; end
 
-  class ValidationError < StandardError; end
+  ErrorData = Struct.new(:kind, :argument, :details)
 
-  class InvalidArgumentTypeError < ValidationError
-    attr_reader :param, :expected_type
-
-    def initialize(param, expected_type)
-      @param = param
-      @expected_type = expected_type
-    end
-
-    def to_s
-      "#{super}: #{param} - #{expected_type} was expected"
-    end
-  end
-
-  class MissingArgumentsError < ValidationError
+  class ValidationError < StandardError
     attr_reader :params
 
     def initialize(params)
       @params = params
     end
+  end
 
+  class InvalidArgumentTypesError < ValidationError
     def to_s
-      "#{super}: #{params.join(',')}"
+      preformated = params.map { |p| "#{p[0]} - #{p[1]} was expected" }
+      "#{super}: #{preformated.join(', ')}"
     end
+  end
 
+  class MissingArgumentsError < ValidationError
+    def to_s
+      "#{super}: #{params.join(', ')}"
+    end
   end
 
 end

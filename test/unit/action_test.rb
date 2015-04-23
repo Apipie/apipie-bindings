@@ -88,8 +88,9 @@ describe ApipieBindings::Action do
             ]
           }
         })
-      end.must_raise(ApipieBindings::InvalidArgumentTypeError)
-      e.message.must_match /: user\[contacts\]\[0\] - Hash was expected$/
+      end.must_raise(ApipieBindings::InvalidArgumentTypesError)
+      e.message.must_match /user\[contacts\]\[0\] - Hash was expected/
+      e.message.must_match /user\[contacts\]\[1\] - Hash was expected/
     end
 
     it "should accept minimal correct params" do
