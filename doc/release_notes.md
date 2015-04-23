@@ -1,6 +1,11 @@
 Release notes
 =============
 
+### 0.0.13 (2015-04-23)
+* Limited rest-client versionto < 1.8.0
+* Added option to turn off param validation (per call)
+* Validation of optional parameters containing required attributes ([#24](https://github.com/Apipie/apipie-bindings/issues/24), [#25](https://github.com/Apipie/apipie-bindings/issues/25))
+
 ### 0.0.12 (2015-03-23)
 * Add readme to the dummy app
 * Fix ordering issue in tests
