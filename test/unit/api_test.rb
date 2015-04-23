@@ -24,6 +24,14 @@ describe ApipieBindings::API do
     api.call(:users, :index, params, headers)
   end
 
+  it "should call the method and skip param validation on demand" do
+    params = { :user => { :vip => true } }
+    headers = { :content_type => 'application/json' }
+    options = { :skip_validation => true }
+    ApipieBindings::API.any_instance.expects(:http_call).with('post', '/users', params, headers, options)
+    api.call(:users, :create, params, headers, options)
+  end
+
   it "should call the method and fill in the params" do
     params = { :id => 1 }
     headers = { :content_type => 'application/json' }

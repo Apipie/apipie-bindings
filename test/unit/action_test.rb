@@ -41,22 +41,79 @@ describe ApipieBindings::Action do
     # incuded params in alphanumeric order.
 
 
-  it "should validate incorrect params" do
-    e = proc do
-      resource.action(:create).validate!({ :user => { :foo => "foo" } })
-    end.must_raise(ApipieBindings::MissingArgumentsError)
-    e.message.must_match /: name$/
+  describe "validate!" do
+    it "should raise on missing required params" do
+      e = proc do
+        resource.action(:create).validate!({ :user => { :vip => true } })
+      end.must_raise(ApipieBindings::MissingArgumentsError)
+      e.message.must_match /: user\[name\]$/
+    end
 
-    e = proc do
-      # completely different sub-hash; should still fail
-      resource.action(:create).validate!({ :apple => { :foo => "foo" } })
-    end.must_raise(ApipieBindings::MissingArgumentsError)
-    e.message.must_match /: name$/
-  end
+    it "should raise on missing nested required params (hash)" do
+      e = proc do
+        resource.action(:create).validate!({
+          :user => {
+            :name => 'Jogn Doe',
+            :address => {
+              :street => 'K JZD'
+            }
+          }
+        })
+      end.must_raise(ApipieBindings::MissingArgumentsError)
+      e.message.must_match /: user\[address\]\[city\]$/
+    end
 
-  it "should accept correct params" do
-    resource.action(:create).validate!({:user => { :name => 'John Doe' } })
-    resource.action(:create_unnested).validate!(:name => "John Doe")
+    it "should raise on missing nested required params (array)" do
+      e = proc do
+        resource.action(:create).validate!({
+          :user => {
+            :name => 'Jogn Doe',
+            :contacts => [
+             {:kind => 'email'},
+            ]
+          }
+        })
+      end.must_raise(ApipieBindings::MissingArgumentsError)
+      e.message.must_match /: user\[contacts\]\[0\]\[contact\]$/
+    end
+
+    it "should raise on invalid param format" do
+      e = proc do
+        resource.action(:create).validate!({
+          :user => {
+            :name => 'Jogn Doe',
+            :contacts => [
+             1,
+             2
+            ]
+          }
+        })
+      end.must_raise(ApipieBindings::InvalidArgumentTypesError)
+      e.message.must_match /user\[contacts\]\[0\] - Hash was expected/
+      e.message.must_match /user\[contacts\]\[1\] - Hash was expected/
+    end
+
+    it "should accept minimal correct params" do
+      resource.action(:create).validate!({:user => { :name => 'John Doe' } })
+      resource.action(:create_unnested).validate!(:name => "John Doe")
+    end
+
+    it "should accept full correct params" do
+      resource.action(:create).validate!({
+        :user => {
+          :name => 'John Doe',
+          :vip => true,
+          :address => {
+            :city => 'Ankh-Morpork',
+            :street => 'Audit Alley'
+          },
+          :contacts => [
+            {:contact => 'john@doe.org', :kind => 'email'},
+            {:contact => '123456', :kind => 'pobox'}
+          ]
+        }
+      })
+    end
   end
 
   it "should have name visible in puts" do

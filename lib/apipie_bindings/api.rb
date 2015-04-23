@@ -148,6 +148,7 @@ module ApipieBindings
     # @param [Hash] options options to influence the how the call is processed
     #   * *:response* (Symbol) *:raw* - skip parsing JSON in response
     #   * *:with_authentication* (Bool) *true* - use rest client with/without auth configuration
+    #   * *:skip_validation* (Bool) *false* - skip validation of parameters
     # @example show user data
     #   call(:users, :show, :id => 1)
     def call(resource_name, action_name, params={}, headers={}, options={})
@@ -155,7 +156,7 @@ module ApipieBindings
       resource = resource(resource_name)
       action = resource.action(action_name)
       route = action.find_route(params)
-      action.validate!(params)
+      action.validate!(params) unless options[:skip_validation]
       options[:fake_response] = find_match(fake_responses, resource_name, action_name, params) || action.examples.first if dry_run?
       return http_call(
         route.method,

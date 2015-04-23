@@ -1,5 +1,3 @@
-require 'apipie_bindings/utilities'
-
 module ApipieBindings
 
   class Param
@@ -13,12 +11,8 @@ module ApipieBindings
       @params = params.map { |p| ApipieBindings::Param.new(p) }
       @expected_type = param[:expected_type].to_sym
       @description = param[:description].gsub(/<\/?[^>]+?>/, "")
-      @required = param[:required] || @params.inject(false) { |req, par| req ||= par.required? }
+      @required = !!param[:required]
       @validator = param[:validator]
-    end
-
-    def tree(&block)
-      ApipieBindings::Utilities.params_hash_tree(@params, &block)
     end
 
     def required?

@@ -1,5 +1,3 @@
-require 'apipie_bindings/utilities'
-
 module ApipieBindings
 
   class Action
@@ -57,35 +55,56 @@ module ApipieBindings
       return suitable_route
     end
 
-    def validate!(params)
-      missing_params = missing_params(api_params_tree { |par| par.required? }, params_tree(params))
-      raise ApipieBindings::MissingArgumentsError.new(missing_params) unless missing_params.empty?
+    def validate!(parameters)
+      errors = validate(params, parameters)
+      
+      missing_arguments, errors = errors.partition { |e| e.kind == :missing_argument }
+      missing_arguments.map! { |e| e.argument }
+      raise ApipieBindings::MissingArgumentsError.new(missing_arguments) unless missing_arguments.empty?
+
+      invalid_types, errors = errors.partition { |e| e.kind == :invalid_type }
+      invalid_types.map! { |e| [e.argument, e.details] }
+      raise ApipieBindings::InvalidArgumentTypesError.new(invalid_types) unless invalid_types.empty?
+      
+      errors.map! { |e| e.argument }
+      raise ApipieBindings::ValidationError.new(errors) unless errors.empty?
     end
 
-    def api_params_tree(&block)
-      ApipieBindings::Utilities.params_hash_tree(self.params, &block)
-    end
+    def validate(params, values, path=nil)
+      return [ErrorData.new(:invalid_type, path, 'Hash')] unless values.respond_to?(:keys)
+      # check required
+      required_keys = params.select(&:required?).map(&:name)
+      given_keys = values.keys.select { |par| !values[par].nil? }.map(&:to_s)
+      missing_params = required_keys - given_keys
+      errors = missing_params.map { |p| ErrorData.new(:missing_argument, add_to_path(path, p)) }
 
-    def params_tree(params)
-      params.inject([]) do |tree, (key, val)|
-        subtree = val.is_a?(Hash) ? { key.to_s => params_tree(val) } : key.to_s
-        tree << subtree
-        tree
-      end
-    end
-
-    def missing_params(master, slave)
-      missing = []
-      master.each do |required_param|
-        if required_param.is_a?(Hash)
-          key = required_param.keys.first
-          slave_hash = slave.select { |p| p.is_a?(Hash) && p[key] }
-          missing << missing_params(required_param[key], slave_hash.first ? slave_hash.first[key] : [])
-        else
-          missing << required_param unless slave.include?(required_param)
+      # check individuals one by one
+      values.each do |param, value|
+        param_description = params.find { |p| p.name == param.to_s }
+        if param_description
+        
+          # nested?
+          if !param_description.params.empty? && !value.nil?
+            # array
+            if param_description.expected_type == :array
+              value.each.with_index do |item, i|
+                errors += validate(param_description.params, item, add_to_path(path, param_description.name, i))
+              end
+            end
+            # hash
+            if param_description.expected_type == :hash
+              errors += validate(param_description.params, value, add_to_path(path, param_description.name))
+            end
+          end
         end
       end
-      missing.flatten.sort
+
+      errors
+    end
+
+    def add_to_path(path, *additions)
+      path ||= ''
+      additions.inject(path) { |new_path, add| new_path.empty? ? "#{add}" : "#{new_path}[#{add}]" }
     end
 
     def to_s
@@ -95,6 +114,5 @@ module ApipieBindings
     def inspect
       to_s
     end
-
   end
 end
