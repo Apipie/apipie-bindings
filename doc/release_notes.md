@@ -1,8 +1,11 @@
 Release notes
 =============
 
+### 0.0.14 (2015-08-25)
+* support rest-client 1.8.0 ([#27](https://github.com/Apipie/apipie-bindings/issues/27))
+
 ### 0.0.13 (2015-04-23)
-* Limited rest-client versionto < 1.8.0
+* Limited rest-client version to < 1.8.0
 * Added option to turn off param validation (per call)
 * Validation of optional parameters containing required attributes ([#24](https://github.com/Apipie/apipie-bindings/issues/24), [#25](https://github.com/Apipie/apipie-bindings/issues/25))
 
