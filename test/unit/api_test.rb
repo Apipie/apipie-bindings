@@ -159,7 +159,12 @@ describe ApipieBindings::API do
     let(:fake_empty_response) {
       data = ApipieBindings::Example.new('', '', '', 200, '[]')
       net_http_resp = Net::HTTPResponse.new(1.0, data.status, "")
-      RestClient::Response.create(data.response, net_http_resp, {})
+      if RestClient::Response.method(:create).arity == 4 # RestClient >= 1.8.0
+        RestClient::Response.create(data.response, net_http_resp, {},
+          RestClient::Request.new(:method=>'GET', :url=>'http://example.com'))
+      else
+        RestClient::Response.create(data.response, net_http_resp, {})
+      end
     }
 
     it "should call credentials to_param when :credentials are set and doing authenticated call" do
