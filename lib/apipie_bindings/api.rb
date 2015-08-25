@@ -91,7 +91,8 @@ module ApipieBindings
 
       @resource_config = {
         :timeout  => config[:timeout],
-        :headers  => headers
+        :headers  => headers,
+        :verify_ssl => false  # keep rest_client >= 1.8.0 setup comaptible
       }.merge(options)
 
       @config = config
@@ -202,7 +203,12 @@ module ApipieBindings
         empty_response = ApipieBindings::Example.new('', '', '', 200, '')
         ex = options[:fake_response ] || empty_response
         net_http_resp = Net::HTTPResponse.new(1.0, ex.status, "")
-        response = RestClient::Response.create(ex.response, net_http_resp, args)
+        if RestClient::Response.method(:create).arity == 4 # RestClient > 1.8.0
+          response = RestClient::Response.create(ex.response, net_http_resp, args,
+            RestClient::Request.new(:method=>http_method, :url=>path))
+        else
+          response = RestClient::Response.create(ex.response, net_http_resp, args)
+        end
       else
         begin
           apidoc_without_auth = (path =~ /\/apidoc\//) && !@apidoc_authenticated
