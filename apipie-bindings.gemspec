@@ -26,7 +26,6 @@ EOF
   s.add_dependency 'json', '>= 1.2.1'
   s.add_dependency 'rest-client', '>= 1.6.5'      # lower versions don't allow setting infinite timeouts
   s.add_dependency 'oauth'
-  s.add_dependency 'awesome_print'
 
   s.add_development_dependency 'rake', '~> 10.1.0'
   s.add_development_dependency 'thor'
