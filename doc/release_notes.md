@@ -1,6 +1,9 @@
 Release notes
 =============
 
+### 0.0.15 (2015-09-21)
+* Make awesome_print optional ([#29](https://github.com/Apipie/apipie-bindings/issues/29))
+
 ### 0.0.14 (2015-08-25)
 * support rest-client 1.8.0 ([#27](https://github.com/Apipie/apipie-bindings/issues/27))
 
