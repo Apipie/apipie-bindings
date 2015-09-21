@@ -68,6 +68,15 @@ irb> api.resource(:architectures).action(:show).call(:id => 1)
 
 ```
 
+#### Logging
+It is possible to set custom (`Logger` compatible) logger while creating API instance.
+
+```ruby
+ApipieBindings::API.new({:uri => 'http://localhost:3000/', :logger => Logging.logger(STDOUT)})
+```
+
+Add gem `awesome_print` to your application Gemfile if you want to debug api calls with awesome inspect.
+
 Documentation
 -------------
 there is not much of the library documented yet, but we started to document our API with Yard.
@@ -77,7 +86,6 @@ The docs are installed with the gem and can be viewed from the docs dir directly
 
 TODO
 ----
-* parameter validation
 * update docs
 
 

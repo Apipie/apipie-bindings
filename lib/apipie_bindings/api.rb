@@ -1,7 +1,6 @@
 require 'json'
 require 'rest_client'
 require 'oauth'
-require 'awesome_print'
 require 'apipie_bindings/rest_client_oauth'
 require 'logger'
 require 'tmpdir'
@@ -85,7 +84,7 @@ module ApipieBindings
       headers.merge!(config[:headers]) unless config[:headers].nil?
       headers.merge!(options.delete(:headers)) unless options[:headers].nil?
 
-      log.debug "Global headers: #{headers.ai}"
+      log.debug "Global headers: #{inspect_data(headers)}"
 
       @credentials = config[:credentials] if config[:credentials] && config[:credentials].respond_to?(:to_params)
 
@@ -194,8 +193,8 @@ module ApipieBindings
       end
 
       log.info "#{http_method.to_s.upcase} #{path}"
-      log.debug "Params: #{params.ai}"
-      log.debug "Headers: #{headers.ai}"
+      log.debug "Params: #{inspect_data(params)}"
+      log.debug "Headers: #{inspect_data(headers)}"
 
       args << headers if headers
 
@@ -218,14 +217,14 @@ module ApipieBindings
           update_cache(response.headers[:apipie_checksum])
         rescue => e
           log.debug e.message + "\n" +
-            (e.respond_to?(:response) ? process_data(e.response).ai : e.ai)
+            inspect_data(e.respond_to?(:response) ? process_data(e.response) : e)
           raise
         end
       end
 
       result = options[:response] == :raw ? response : process_data(response)
-      log.debug "Response: %s" % (options[:reduce_response_log] ? "Received OK" : result.ai)
-      log.debug "Response headers: #{response.headers.ai}" if response.respond_to?(:headers)
+      log.debug "Response: %s" % (options[:reduce_response_log] ? "Received OK" : inspect_data(result))
+      log.debug "Response headers: #{inspect_data(response.headers)}" if response.respond_to?(:headers)
       result
     end
 
@@ -345,6 +344,9 @@ module ApipieBindings
              end
       return data
     end
-  end
 
+    def inspect_data(obj)
+      ApipieBindings::Utils.inspect_data(obj)
+    end
+  end
 end

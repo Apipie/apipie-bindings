@@ -1,4 +1,5 @@
 require 'apipie_bindings/version'
+require 'apipie_bindings/utils'
 require 'apipie_bindings/credentials'
 require 'apipie_bindings/exceptions'
 require 'apipie_bindings/inflector'
