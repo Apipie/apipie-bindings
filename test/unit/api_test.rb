@@ -203,6 +203,17 @@ describe ApipieBindings::API do
         api.check_cache
       end
     end
+
+    it "should clear credentials" do
+      Dir.mktmpdir do |dir|
+        credentials = ApipieBindings::AbstractCredentials.new
+        api = ApipieBindings::API.new({
+                                          :uri => 'http://example.com', :apidoc_cache_base_dir => dir, :api_version => 2,
+                                          :credentials => credentials})
+        credentials.expects(:clear)
+        api.clear_credentials
+      end
+    end
   end
 
 end
