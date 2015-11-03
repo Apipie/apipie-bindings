@@ -109,6 +109,10 @@ module ApipieBindings
       end
     end
 
+    def clear_credentials
+      @client_with_auth = nil
+      @credentials.clear
+    end
 
     def apidoc
       @apidoc = @apidoc || load_apidoc || retrieve_apidoc
