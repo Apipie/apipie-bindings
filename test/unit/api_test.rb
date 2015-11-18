@@ -214,6 +214,19 @@ describe ApipieBindings::API do
         api.clear_credentials
       end
     end
+
+    it "should call clear_credentials when doing authenticated call and auth error is raised" do
+      Dir.mktmpdir do |dir|
+        credentials = ApipieBindings::AbstractCredentials.new
+        api = ApipieBindings::API.new({:uri => 'http://example.com', :apidoc_cache_base_dir => dir, :api_version => 2,
+                                       :credentials => credentials})
+        api.expects(:clear_credentials)
+        api.stubs(:call_client).raises(RestClient::Unauthorized)
+        assert_raises RestClient::Unauthorized do
+          api.http_call(:get, '/path')
+        end
+      end
+    end
   end
 
 end
