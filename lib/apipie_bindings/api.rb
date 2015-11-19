@@ -220,6 +220,7 @@ module ApipieBindings
           response = call_client(client, path, args)
           update_cache(response.headers[:apipie_checksum])
         rescue => e
+          clear_credentials if e.is_a? RestClient::Unauthorized
           log.debug e.message + "\n" +
             inspect_data(e.respond_to?(:response) ? process_data(e.response) : e)
           raise
