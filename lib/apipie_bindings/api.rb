@@ -159,9 +159,14 @@ module ApipieBindings
       check_cache if @aggressive_cache_checking
       resource = resource(resource_name)
       action = resource.action(action_name)
-      route = action.find_route(params)
       action.validate!(params) unless options[:skip_validation]
       options[:fake_response] = find_match(fake_responses, resource_name, action_name, params) || action.examples.first if dry_run?
+
+      call_action(action, params, headers, options)
+    end
+
+    def call_action(action, params={}, headers={}, options={})
+      route = action.find_route(params)
       return http_call(
         route.method,
         route.path(params),

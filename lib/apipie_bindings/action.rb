@@ -2,7 +2,7 @@ module ApipieBindings
 
   class Action
 
-    attr_reader :name
+    attr_reader :name, :resource
 
     def initialize(resource, name, api)
       @resource = resource
@@ -57,7 +57,7 @@ module ApipieBindings
 
     def validate!(parameters)
       errors = validate(params, parameters)
-      
+
       missing_arguments, errors = errors.partition { |e| e.kind == :missing_argument }
       missing_arguments.map! { |e| e.argument }
       raise ApipieBindings::MissingArgumentsError.new(missing_arguments) unless missing_arguments.empty?
@@ -65,7 +65,7 @@ module ApipieBindings
       invalid_types, errors = errors.partition { |e| e.kind == :invalid_type }
       invalid_types.map! { |e| [e.argument, e.details] }
       raise ApipieBindings::InvalidArgumentTypesError.new(invalid_types) unless invalid_types.empty?
-      
+
       errors.map! { |e| e.argument }
       raise ApipieBindings::ValidationError.new(errors) unless errors.empty?
     end
@@ -82,7 +82,7 @@ module ApipieBindings
       values.each do |param, value|
         param_description = params.find { |p| p.name == param.to_s }
         if param_description
-        
+
           # nested?
           if !param_description.params.empty? && !value.nil?
             # array
