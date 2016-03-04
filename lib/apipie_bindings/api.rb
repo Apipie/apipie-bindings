@@ -8,7 +8,7 @@ module ApipieBindings
 
   class API
 
-    attr_reader :apidoc_cache_name, :fake_responses, :language
+    attr_reader :apidoc_cache_name, :fake_responses, :language, :uri
     attr_writer :dry_run
 
     # Creates new API bindings instance
@@ -201,6 +201,7 @@ module ApipieBindings
         headers[:params] = params if params
       end
 
+      log.info "Server: #{@uri}"
       log.info "#{http_method.to_s.upcase} #{path}"
       log.debug "Params: #{inspect_data(params)}"
       log.debug "Headers: #{inspect_data(headers)}"
