@@ -8,7 +8,7 @@ module ApipieBindings
 
   class API
 
-    attr_reader :apidoc_cache_name, :fake_responses, :language, :uri
+    attr_reader :apidoc_cache_name, :fake_responses, :language, :uri, :follow_redirects
     attr_writer :dry_run
 
     # Creates new API bindings instance
@@ -45,6 +45,8 @@ module ApipieBindings
     #   *after* each API request
     # @option config [Object] :logger (Logger.new(STDERR)) custom logger class
     # @option config [Number] :timeout API request timeout in seconds
+    # @option config [Symbol] :follow_redirects (:default) Possible values are :always, :never and :default.
+    #   The :default is to only redirect in GET and HEAD requests (RestClient default)
     # @param [Hash] options params that are passed to ResClient as-is
     # @raise [ApipieBindings::ConfigurationError] when no +:uri+ or +:apidoc_cache_dir+ is provided
     # @example connect to a server
@@ -65,6 +67,7 @@ module ApipieBindings
       @apidoc_cache_dir = config[:apidoc_cache_dir] || File.join(apidoc_cache_base_dir, @uri.tr(':/', '_'), "v#{@api_version}")
       @apidoc_cache_name = config[:apidoc_cache_name] || set_default_name
       @apidoc_authenticated = (config[:apidoc_authenticated].nil? ? true : config[:apidoc_authenticated])
+      @follow_redirects = config.fetch(:follow_redirects, :default)
       @dry_run = config[:dry_run] || false
       @aggressive_cache_checking = config[:aggressive_cache_checking] || false
       @fake_responses = config[:fake_responses] || {}
@@ -85,6 +88,7 @@ module ApipieBindings
       headers.merge!(options.delete(:headers)) unless options[:headers].nil?
 
       log.debug "Global headers: #{inspect_data(headers)}"
+      log.debug "Follow redirects: #{@follow_redirects.to_s}"
 
       @credentials = config[:credentials] if config[:credentials] && config[:credentials].respond_to?(:to_params)
 
@@ -211,13 +215,7 @@ module ApipieBindings
       if dry_run?
         empty_response = ApipieBindings::Example.new('', '', '', 200, '')
         ex = options[:fake_response ] || empty_response
-        net_http_resp = Net::HTTPResponse.new(1.0, ex.status, "")
-        if RestClient::Response.method(:create).arity == 4 # RestClient > 1.8.0
-          response = RestClient::Response.create(ex.response, net_http_resp, args,
-            RestClient::Request.new(:method=>http_method, :url=>path))
-        else
-          response = RestClient::Response.create(ex.response, net_http_resp, args)
-        end
+        response = create_fake_response(ex.status, ex.response, http_method, path, args)
       else
         begin
           apidoc_without_auth = (path =~ /\/apidoc\//) && !@apidoc_authenticated
@@ -293,7 +291,32 @@ module ApipieBindings
     private
 
     def call_client(client, path, args)
-      client[path].send(*args)
+      block = rest_client_call_block
+      client[path].send(*args, &block)
+    end
+
+    def rest_client_call_block
+      Proc.new do |response, request, result, &block|
+        if [301, 302, 307].include?(response.code) && [:always, :never].include?(@follow_redirects)
+          if @follow_redirects == :always
+            log.debug "Response redirected to #{response.headers[:location]}"
+            response.follow_redirection(request, result, &block)
+          else
+            raise exception_with_response(response)
+          end
+        else
+          response.return!(request, result, &block)
+        end
+      end
+    end
+
+    def exception_with_response(response)
+      begin
+        klass = RestClient::Exceptions::EXCEPTIONS_MAP.fetch(response.code)
+      rescue KeyError
+        raise RestClient.RequestFailed.new(response, response.code)
+      end
+      raise klass.new(response, response.code)
     end
 
     def authenticated_client
@@ -358,6 +381,19 @@ module ApipieBindings
 
     def inspect_data(obj)
       ApipieBindings::Utils.inspect_data(obj)
+    end
+
+    def create_fake_response(status, body, method, path, args={})
+      net_http_resp = Net::HTTPResponse.new(1.0, status, "")
+      if RestClient::Response.method(:create).arity == 4 # RestClient > 1.8.0
+        RestClient::Response.create(body, net_http_resp, args, create_fake_request(method, path))
+      else
+        RestClient::Response.create(body, net_http_resp, args)
+      end
+    end
+
+    def create_fake_request(method, path)
+      RestClient::Request.new(:method=>method, :url=>path)
     end
   end
 end

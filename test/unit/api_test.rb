@@ -154,6 +154,49 @@ describe ApipieBindings::API do
     end
   end
 
+  context "redirects" do
+    def configure_api_with(options={})
+      default_options = {
+        :apidoc_cache_dir => 'test/unit/data',
+        :apidoc_cache_name => 'dummy'
+      }
+      ApipieBindings::API.new(default_options.merge(options))
+    end
+
+    it "should follow RestClient default behaviour by default" do
+      api = configure_api_with()
+      api.follow_redirects.must_equal :default
+    end
+
+    it "should be possible to change redirects handling" do
+      api = configure_api_with(:follow_redirects => :never)
+      api.follow_redirects.must_equal :never
+    end
+
+    it "should rise error on redirect when follow_redirects = :never" do
+      api = configure_api_with(:follow_redirects => :never)
+      block = api.send(:rest_client_call_block)
+      response = api.send(:create_fake_response, 301, "", "GET", "/", {})
+      proc { block.call(response) }.must_raise RestClient::MovedPermanently
+    end
+
+    it "should follow redirect when follow_redirects = :always" do
+      api = configure_api_with(:follow_redirects => :always)
+      block = api.send(:rest_client_call_block)
+      response = api.send(:create_fake_response, 301, "", "POST", "/", {})
+      response.expects(:follow_redirection)
+      block.call(response)
+    end
+
+    it "should use original handling when follow_redirects = :default" do
+      api = configure_api_with(:follow_redirects => :default)
+      block = api.send(:rest_client_call_block)
+      response = api.send(:create_fake_response, 301, "", "GET", "/", {})
+      response.expects(:return!)
+      block.call(response)
+    end
+  end
+
   context "credentials" do
 
     let(:fake_empty_response) {
