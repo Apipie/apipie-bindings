@@ -1,6 +1,14 @@
 Release notes
 =============
 
+### 0.0.16 (2016-03-08)
+* Controll following redirection ([#37](https://github.com/Apipie/apipie-bindings/issues/37))
+* Enable for mocking api calls with validations
+* Log the server uri ([#36](https://github.com/Apipie/apipie-bindings/issues/36))
+* build without sudo ([#40](https://github.com/Apipie/apipie-bindings/issues/40))
+* Added clear credentials on error ([#12112](http://projects.theforeman.org/issues/12112))
+* Added a function that enables removing credentials on need ([#12112](http://projects.theforeman.org/issues/12112))
+
 ### 0.0.15 (2015-09-21)
 * Make awesome_print optional ([#29](https://github.com/Apipie/apipie-bindings/issues/29))
 
