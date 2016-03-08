@@ -8,4 +8,4 @@ rvm:
   - ruby-head
   - jruby-18mode
   - jruby-19mode
-  - jruby-head
+# - jruby-head 
