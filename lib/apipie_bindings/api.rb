@@ -115,7 +115,7 @@ module ApipieBindings
 
     def clear_credentials
       @client_with_auth = nil
-      @credentials.clear
+      @credentials.clear if @credentials
     end
 
     def apidoc
