@@ -1,7 +1,5 @@
 require 'json'
-require 'rest_client'
 require 'oauth'
-require 'apipie_bindings/rest_client_oauth'
 require 'logger'
 require 'tmpdir'
 module ApipieBindings
@@ -297,6 +295,9 @@ module ApipieBindings
 
     def rest_client_call_block
       Proc.new do |response, request, result, &block|
+        # include request for rest_client < 1.8.0
+        response.request ||= request
+
         if [301, 302, 307].include?(response.code) && [:always, :never].include?(@follow_redirects)
           if @follow_redirects == :always
             log.debug "Response redirected to #{response.headers[:location]}"

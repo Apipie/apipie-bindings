@@ -173,11 +173,19 @@ describe ApipieBindings::API do
       api.follow_redirects.must_equal :never
     end
 
-    it "should rise error on redirect when follow_redirects = :never" do
-      api = configure_api_with(:follow_redirects => :never)
-      block = api.send(:rest_client_call_block)
-      response = api.send(:create_fake_response, 301, "", "GET", "/", {})
-      proc { block.call(response) }.must_raise RestClient::MovedPermanently
+    context "follow_redirects = :never" do
+      let(:api) { configure_api_with(:follow_redirects => :never) }
+      let(:block) { api.send(:rest_client_call_block) }
+      let(:response) { api.send(:create_fake_response, 301, "", "GET", "/", {}) }
+
+      it "should rise error on redirect" do
+        proc { block.call(response) }.must_raise RestClient::MovedPermanently
+      end
+
+      it "should rise error that contains the request" do
+        err = proc { block.call(response) }.must_raise RestClient::MovedPermanently
+        err.response.respond_to?(:request).must_equal true
+      end
     end
 
     it "should follow redirect when follow_redirects = :always" do
