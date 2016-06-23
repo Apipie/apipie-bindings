@@ -1,6 +1,11 @@
 Release notes
 =============
 
+### 0.0.17 (2016-06-23)
+* Restrict rest-client version to < 2.0.0 ([#42](https://github.com/Apipie/apipie-bindings/issues/42))
+* Include request in response for rest-client < 1.8.0 ([#11147](http://projects.theforeman.org/issues/11147))
+* Don't try to clear credentials if nil ([#43](https://github.com/Apipie/apipie-bindings/issues/43))
+
 ### 0.0.16 (2016-03-08)
 * Controll following redirection ([#37](https://github.com/Apipie/apipie-bindings/issues/37))
 * Enable for mocking api calls with validations
