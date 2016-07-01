@@ -13,6 +13,10 @@ if RUBY_VERSION < "1.9"
   gem 'mime-types', '~> 1.0'
 end
 
+if RUBY_VERSION < "2.0"
+  gem 'json', '< 2.0.0'
+end
+
 gem 'rest-client', rest_client
 
 # load local gemfile
