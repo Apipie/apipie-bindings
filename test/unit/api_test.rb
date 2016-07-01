@@ -71,9 +71,11 @@ describe ApipieBindings::API do
       :dry_run => true})
     s = StringIO.new; s << 'foo'
     headers = {:content_type => 'multipart/form-data', :multipart => true}
-    RestClient::Response.expects(:create).with() {
-      |body, head, args| args == [:post, {:file => s}, headers]
-    }
+    RestClient::Response.expects(:create).with do |*args|
+      # on 1.8, prefer the copy of args kept in the original request object
+      request_args = RestClient.version >= '1.8.0' ? args.last.args : args.last
+      request_args[:method] == :post && request_args[:params] == {:file => s} && request_args[:headers] == headers
+    end
     result = api.http_call(:post, '/api/path', {:file => s}, headers, {:response => :raw})
   end
 
@@ -176,7 +178,7 @@ describe ApipieBindings::API do
     context "follow_redirects = :never" do
       let(:api) { configure_api_with(:follow_redirects => :never) }
       let(:block) { api.send(:rest_client_call_block) }
-      let(:response) { api.send(:create_fake_response, 301, "", "GET", "/", {}) }
+      let(:response) { api.send(:create_fake_response, 301, "", "GET", "http://example.com/", {}) }
 
       it "should rise error on redirect" do
         proc { block.call(response) }.must_raise RestClient::MovedPermanently
@@ -191,7 +193,7 @@ describe ApipieBindings::API do
     it "should follow redirect when follow_redirects = :always" do
       api = configure_api_with(:follow_redirects => :always)
       block = api.send(:rest_client_call_block)
-      response = api.send(:create_fake_response, 301, "", "POST", "/", {})
+      response = api.send(:create_fake_response, 301, "", "POST", "http://example.com/", {})
       response.expects(:follow_redirection)
       block.call(response)
     end
@@ -199,7 +201,7 @@ describe ApipieBindings::API do
     it "should use original handling when follow_redirects = :default" do
       api = configure_api_with(:follow_redirects => :default)
       block = api.send(:rest_client_call_block)
-      response = api.send(:create_fake_response, 301, "", "GET", "/", {})
+      response = api.send(:create_fake_response, 301, "", "GET", "http://example.com/", {})
       response.expects(:return!)
       block.call(response)
     end
@@ -210,7 +212,10 @@ describe ApipieBindings::API do
     let(:fake_empty_response) {
       data = ApipieBindings::Example.new('', '', '', 200, '[]')
       net_http_resp = Net::HTTPResponse.new(1.0, data.status, "")
-      if RestClient::Response.method(:create).arity == 4 # RestClient >= 1.8.0
+      if RestClient.version >= '2.0.0'
+        RestClient::Response.create(data.response, net_http_resp,
+          RestClient::Request.new(:method=>'GET', :url=>'http://example.com'))
+      elsif RestClient.version >= '1.8.0'
         RestClient::Response.create(data.response, net_http_resp, {},
           RestClient::Request.new(:method=>'GET', :url=>'http://example.com'))
       else

@@ -213,7 +213,7 @@ module ApipieBindings
       if dry_run?
         empty_response = ApipieBindings::Example.new('', '', '', 200, '')
         ex = options[:fake_response ] || empty_response
-        response = create_fake_response(ex.status, ex.response, http_method, path, args)
+        response = create_fake_response(ex.status, ex.response, http_method, URI.join(@uri || 'http://example.com', path).to_s, args)
       else
         begin
           apidoc_without_auth = (path =~ /\/apidoc\//) && !@apidoc_authenticated
@@ -306,7 +306,11 @@ module ApipieBindings
             raise exception_with_response(response)
           end
         else
-          response.return!(request, result, &block)
+          if response.method(:return!).arity.zero?  # 2.0.0+
+            response.return!(&block)
+          else
+            response.return!(request, result, &block)
+          end
         end
       end
     end
@@ -384,17 +388,23 @@ module ApipieBindings
       ApipieBindings::Utils.inspect_data(obj)
     end
 
-    def create_fake_response(status, body, method, path, args={})
+    def create_fake_response(status, body, method, path, args=[])
+      request_args = {:method => args.shift || method, :url => path}
+      request_args[:params] = args.shift if %w[post put].include?(method.to_s)
+      request_args[:headers] = args.shift
+
       net_http_resp = Net::HTTPResponse.new(1.0, status, "")
-      if RestClient::Response.method(:create).arity == 4 # RestClient > 1.8.0
-        RestClient::Response.create(body, net_http_resp, args, create_fake_request(method, path))
+      if RestClient.version >= '2.0.0'
+        RestClient::Response.create(body, net_http_resp, create_fake_request(request_args))
+      elsif RestClient.version >= '1.8.0'
+        RestClient::Response.create(body, net_http_resp, request_args, create_fake_request(request_args))
       else
-        RestClient::Response.create(body, net_http_resp, args)
+        RestClient::Response.create(body, net_http_resp, request_args)
       end
     end
 
-    def create_fake_request(method, path)
-      RestClient::Request.new(:method=>method, :url=>path)
+    def create_fake_request(args)
+      RestClient::Request.new(args)
     end
   end
 end

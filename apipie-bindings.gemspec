@@ -24,7 +24,7 @@ EOF
   s.require_paths    = ["lib"]
 
   s.add_dependency 'json', '>= 1.2.1'
-  s.add_dependency 'rest-client', '>= 1.6.5', '< 2.0.0'      # lower versions don't allow setting infinite timeouts, higher versions have different api
+  s.add_dependency 'rest-client', '>= 1.6.5', '< 3.0.0'      # lower versions don't allow setting infinite timeouts, higher versions have different api
   s.add_dependency 'oauth'
 
   s.add_development_dependency 'rake', '~> 10.1.0'
