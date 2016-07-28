@@ -223,8 +223,8 @@ module ApipieBindings
           update_cache(response.headers[:apipie_checksum])
         rescue => e
           clear_credentials if e.is_a? RestClient::Unauthorized
-          log.debug e.message + "\n" +
-            inspect_data(e.respond_to?(:response) ? process_data(e.response) : e)
+          log.error e.message
+          log.debug inspect_data(e)
           raise
         end
       end
@@ -385,7 +385,10 @@ module ApipieBindings
     end
 
     def inspect_data(obj)
-      ApipieBindings::Utils.inspect_data(obj)
+      ApipieBindings::Utils.inspect_data(obj.respond_to?(:response) ? process_data(obj.response) : obj)
+    rescue => e
+      log.debug "Error during inspecting response: #{e.message}"
+      ''
     end
 
     def create_fake_response(status, body, method, path, args=[])
