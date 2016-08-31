@@ -1,6 +1,12 @@
 Release notes
 =============
 
+### 0.0.18 (2016-08-31)
+* Recover from exception while inspecting error response ([#48](https://github.com/Apipie/apipie-bindings/issues/48))
+* Add yard docs for ApipieBindings::Resource class ([#47](https://github.com/Apipie/apipie-bindings/issues/47))
+* Restrict json to < 2.0.0 ([#46](https://github.com/Apipie/apipie-bindings/issues/46))
+* Support rest-client 2.0.0 ([#45](https://github.com/Apipie/apipie-bindings/issues/45))
+
 ### 0.0.17 (2016-06-23)
 * Restrict rest-client version to < 2.0.0 ([#42](https://github.com/Apipie/apipie-bindings/issues/42))
 * Include request in response for rest-client < 1.8.0 ([#11147](http://projects.theforeman.org/issues/11147))
