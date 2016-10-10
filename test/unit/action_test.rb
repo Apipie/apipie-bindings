@@ -118,11 +118,11 @@ describe ApipieBindings::Action do
 
   it "should have name visible in puts" do
     out, err = capture_io { puts resource.action(:index) }
-    out.must_equal "<Action :index>\n"
+    out.must_equal "<Action users:index>\n"
   end
 
   it "should have name visible in inspect" do
-    resource.action(:index).inspect.must_equal "<Action :index>"
+    resource.action(:index).inspect.must_equal "<Action users:index>"
   end
 
   it "should have examples" do

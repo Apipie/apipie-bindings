@@ -33,8 +33,8 @@ irb> api.resources
 ##### Listing actions
 
 ```
-irb> api.resource(:architectures).actions
-=> [<Action :index>, <Action :show>, <Action :create>, <Action :update>, <Action :destroy>]
+irb> api.resource(:roles).actions
+=> [<Action roles:index>, <Action roles:show>, <Action roles:create>, <Action roles:update>, <Action roles:destroy>]
 ```
 
 ##### Listing routes
