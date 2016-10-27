@@ -2,6 +2,7 @@ module ApipieBindings
 
   class ConfigurationError < StandardError; end
   class DocLoadingError < StandardError; end
+  class AuthenticatorMissingError < StandardError; end
 
   ErrorData = Struct.new(:kind, :argument, :details)
 
