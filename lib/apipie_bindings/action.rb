@@ -108,7 +108,7 @@ module ApipieBindings
     end
 
     def to_s
-      "<Action :#{@name}>"
+      "<Action #{@resource}:#{@name}>"
     end
 
     def inspect
