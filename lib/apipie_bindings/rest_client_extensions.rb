@@ -11,10 +11,7 @@ module ApipieBindings
 
     unless RestClient.const_defined? :AUTHENTICATOR_EXTENSION
       RestClient::AUTHENTICATOR_EXTENSION = lambda do |request, args|
-        if args[:authenticator]
-          authenticator = args.delete(:authenticator)
-          authenticator.authenticate(request, args)
-        end
+        args[:authenticator].authenticate(request, args) if args[:authenticator]
       end
     end
 

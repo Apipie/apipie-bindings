@@ -219,14 +219,14 @@ module ApipieBindings
         ex = options[:fake_response ] || empty_response
         response = create_fake_response(ex.status, ex.response, http_method, URI.join(@uri || 'http://example.com', path).to_s, args)
       else
+        apidoc_without_auth = (path =~ /\/apidoc\//) && !@apidoc_authenticated
+        authenticate = options[:with_authentication].nil? ? !apidoc_without_auth : options[:with_authentication]
         begin
-          apidoc_without_auth = (path =~ /\/apidoc\//) && !@apidoc_authenticated
-          authenticate = options[:with_authentication].nil? ? !apidoc_without_auth : options[:with_authentication]
           client = authenticate ? authenticated_client : unauthenticated_client
           response = call_client(client, path, args)
           update_cache(response.headers[:apipie_checksum])
         rescue => e
-          @authenticator.error(e) unless @authenticator.nil?
+          @authenticator.error(e) if authenticate && @authenticator
           log.error e.message
           log.debug inspect_data(e)
           raise
@@ -315,7 +315,7 @@ module ApipieBindings
         # include request for rest_client < 1.8.0
         response.request ||= request
 
-        @authenticator.response(response) if @authenticator
+        request.args[:authenticator].response(response) if request && request.args[:authenticator]
 
         if [301, 302, 307].include?(response.code) && [:always, :never].include?(@follow_redirects)
           if @follow_redirects == :always

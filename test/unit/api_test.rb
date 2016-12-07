@@ -248,7 +248,6 @@ describe ApipieBindings::API do
 
       it "passes error to authenticator" do
         Dir.mktmpdir do |dir|
-          credentials = ApipieBindings::AbstractCredentials.new
           api = ApipieBindings::API.new(binding_params(dir))
           api.stubs(:call_client).raises(RestClient::Unauthorized)
           authenticator.expects(:error).with do |e|
@@ -278,6 +277,28 @@ describe ApipieBindings::API do
           api.expects(:unauthenticated_client)
           api.stubs(:call_client).returns(fake_empty_response)
 
+          api.check_cache
+        end
+      end
+
+      it "doesn't pass error to authenticator" do
+        Dir.mktmpdir do |dir|
+          api = ApipieBindings::API.new(binding_params(dir, :apidoc_authenticated => false))
+          api.expects(:unauthenticated_client)
+          api.stubs(:call_client).raises(RestClient::Unauthorized)
+
+          authenticator.expects(:error).never
+          api.check_cache
+        end
+      end
+
+      it "doesn't pass response to authenticator" do
+        Dir.mktmpdir do |dir|
+          api = ApipieBindings::API.new(binding_params(dir, :apidoc_authenticated => false))
+          api.expects(:unauthenticated_client)
+          api.stubs(:call_client).returns(fake_empty_response)
+
+          authenticator.expects(:response).never
           api.check_cache
         end
       end
