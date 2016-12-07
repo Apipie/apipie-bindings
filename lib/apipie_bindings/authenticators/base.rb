@@ -9,6 +9,10 @@ module ApipieBindings
 
       def response(r)
       end
+
+      def name
+        self.class.name
+      end
     end
   end
 end

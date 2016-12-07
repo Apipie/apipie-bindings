@@ -347,6 +347,8 @@ module ApipieBindings
       resource_config = @resource_config.dup
       resource_config[:authenticator] = get_authenticator
 
+      log.debug "Using authenticator: #{resource_config[:authenticator].name}"
+
       RestClient::Resource.new(@config[:uri], resource_config)
     end
 
