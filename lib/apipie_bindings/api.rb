@@ -45,6 +45,7 @@ module ApipieBindings
     # @option config [Number] :timeout API request timeout in seconds, use -1 to disable timeout
     # @option config [Symbol] :follow_redirects (:default) Possible values are :always, :never and :default.
     #   The :default is to only redirect in GET and HEAD requests (RestClient default)
+    # @option config [AbstractAuthenticator] :authenticator API request authenticator
     # @param [Hash] options params that are passed to ResClient as-is
     # @raise [ApipieBindings::ConfigurationError] when no +:uri+ or +:apidoc_cache_dir+ is provided
     # @example connect to a server
@@ -88,7 +89,11 @@ module ApipieBindings
       log.debug "Global headers: #{inspect_data(headers)}"
       log.debug "Follow redirects: #{@follow_redirects.to_s}"
 
-      @credentials = config[:credentials] if config[:credentials] && config[:credentials].respond_to?(:to_params)
+      if config[:authenticator]
+        @authenticator = config[:authenticator]
+      else
+        @authenticator = legacy_authenticator(config)
+      end
 
       if (config[:timeout] && config[:timeout].to_i < 0)
         config[:timeout] = (RestClient.version < '1.7.0') ? -1 : nil
@@ -115,8 +120,7 @@ module ApipieBindings
     end
 
     def clear_credentials
-      @client_with_auth = nil
-      @credentials.clear if @credentials
+      @authenticator.clear if @authenticator && @authenticator.respond_to?(:clear)
     end
 
     def apidoc
@@ -218,14 +222,14 @@ module ApipieBindings
         ex = options[:fake_response ] || empty_response
         response = create_fake_response(ex.status, ex.response, http_method, URI.join(@uri || 'http://example.com', path).to_s, args)
       else
+        apidoc_without_auth = (path =~ /\/apidoc\//) && !@apidoc_authenticated
+        authenticate = options[:with_authentication].nil? ? !apidoc_without_auth : options[:with_authentication]
         begin
-          apidoc_without_auth = (path =~ /\/apidoc\//) && !@apidoc_authenticated
-          authenticate = options[:with_authentication].nil? ? !apidoc_without_auth : options[:with_authentication]
           client = authenticate ? authenticated_client : unauthenticated_client
           response = call_client(client, path, args)
           update_cache(response.headers[:apipie_checksum])
         rescue => e
-          clear_credentials if e.is_a? RestClient::Unauthorized
+          @authenticator.error(e) if authenticate && @authenticator
           log.error e.message
           log.debug inspect_data(e)
           raise
@@ -291,6 +295,19 @@ module ApipieBindings
 
     private
 
+    def legacy_authenticator(config)
+      if config[:user] || config[:password]
+        Authenticators::BasicAuth.new(config[:user], config[:password])
+      elsif config[:credentials] && config[:credentials].respond_to?(:to_params)
+        log.warn("Credentials are now deprecated, use custom authenticator instead.")
+        Authenticators::CredentialsLegacy.new(config[:credentials])
+      elsif config[:oauth]
+        log.warn("Passing oauth credentials in hash is now deprecated, use oauth authenticator instead.")
+        oauth = config[:oauth]
+        Authenticators::Oauth.new(oauth[:consumer_key], oauth[:consumer_secret], oauth[:options])
+      end
+    end
+
     def call_client(client, path, args)
       block = rest_client_call_block
       client[path].send(*args, &block)
@@ -300,6 +317,8 @@ module ApipieBindings
       Proc.new do |response, request, result, &block|
         # include request for rest_client < 1.8.0
         response.request ||= request
+
+        request.args[:authenticator].response(response) if request && request.args[:authenticator]
 
         if [301, 302, 307].include?(response.code) && [:always, :never].include?(@follow_redirects)
           if @follow_redirects == :always
@@ -328,20 +347,21 @@ module ApipieBindings
     end
 
     def authenticated_client
-      unless @client_with_auth
-        resource_config = @resource_config.merge({
-          :user     => @config[:username],
-          :password => @config[:password],
-          :oauth    => @config[:oauth],
-        })
-        resource_config.merge!(@credentials.to_params) if @credentials
-        @client_with_auth = RestClient::Resource.new(@config[:uri], resource_config)
-      end
-      @client_with_auth
+      resource_config = @resource_config.dup
+      resource_config[:authenticator] = get_authenticator
+
+      log.debug "Using authenticator: #{resource_config[:authenticator].name}"
+
+      RestClient::Resource.new(@config[:uri], resource_config)
     end
 
     def unauthenticated_client
       @client_without_auth ||= RestClient::Resource.new(@config[:uri], @resource_config)
+    end
+
+    def get_authenticator
+      raise ApipieBindings::AuthenticatorMissingError if @authenticator.nil?
+      @authenticator
     end
 
     def retrieve_apidoc_call(path, options={})

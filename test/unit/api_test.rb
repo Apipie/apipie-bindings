@@ -207,6 +207,104 @@ describe ApipieBindings::API do
     end
   end
 
+  context "authenticators" do
+
+    let(:fake_empty_response) {
+      data = ApipieBindings::Example.new('', '', '', 200, '[]')
+      net_http_resp = Net::HTTPResponse.new(1.0, data.status, "")
+      if RestClient.version >= '2.0.0'
+        RestClient::Response.create(data.response, net_http_resp,
+          RestClient::Request.new(:method=>'GET', :url=>'http://example.com'))
+      elsif RestClient.version >= '1.8.0'
+        RestClient::Response.create(data.response, net_http_resp, {},
+          RestClient::Request.new(:method=>'GET', :url=>'http://example.com'))
+      else
+        RestClient::Response.create(data.response, net_http_resp, {})
+      end
+    }
+    let(:authenticator) { stub(:name => :auth) }
+
+    def binding_params(cache_dir, params = {})
+      base_params = {
+        :uri => 'http://example.com',
+        :api_version => 2,
+        :apidoc_cache_base_dir => cache_dir,
+        :authenticator => authenticator
+      }
+      base_params.merge(params)
+    end
+
+    context "when doing authenticated call" do
+      it "passes authenticator to the client" do
+        Dir.mktmpdir do |dir|
+          api = ApipieBindings::API.new(binding_params(dir))
+          api.expects(:call_client).with do |client, path, args|
+            client.options[:authenticator] == authenticator
+          end.returns(fake_empty_response)
+
+          api.http_call(:get, '/path')
+        end
+      end
+
+      it "passes error to authenticator" do
+        Dir.mktmpdir do |dir|
+          api = ApipieBindings::API.new(binding_params(dir))
+          api.stubs(:call_client).raises(RestClient::Unauthorized)
+          authenticator.expects(:error).with do |e|
+            e.is_a? RestClient::Unauthorized
+          end
+          assert_raises RestClient::Unauthorized do
+            api.http_call(:get, '/path')
+          end
+        end
+      end
+
+      it "raises exception when authenticator wasn't provided" do
+        Dir.mktmpdir do |dir|
+          api = ApipieBindings::API.new(binding_params(dir, :authenticator => nil))
+
+          assert_raises ApipieBindings::AuthenticatorMissingError do
+            api.http_call(:get, '/path')
+          end
+        end
+      end
+    end
+
+    context "when :apidoc_authenticated => false" do
+      it "doesn't pass request to authenticator" do
+        Dir.mktmpdir do |dir|
+          api = ApipieBindings::API.new(binding_params(dir, :apidoc_authenticated => false))
+          api.expects(:unauthenticated_client)
+          api.stubs(:call_client).returns(fake_empty_response)
+
+          api.check_cache
+        end
+      end
+
+      it "doesn't pass error to authenticator" do
+        Dir.mktmpdir do |dir|
+          api = ApipieBindings::API.new(binding_params(dir, :apidoc_authenticated => false))
+          api.expects(:unauthenticated_client)
+          api.stubs(:call_client).raises(RestClient::Unauthorized)
+
+          authenticator.expects(:error).never
+          api.check_cache
+        end
+      end
+
+      it "doesn't pass response to authenticator" do
+        Dir.mktmpdir do |dir|
+          api = ApipieBindings::API.new(binding_params(dir, :apidoc_authenticated => false))
+          api.expects(:unauthenticated_client)
+          api.stubs(:call_client).returns(fake_empty_response)
+
+          authenticator.expects(:response).never
+          api.check_cache
+        end
+      end
+    end
+  end
+
   context "credentials" do
 
     let(:fake_empty_response) {
@@ -222,19 +320,6 @@ describe ApipieBindings::API do
         RestClient::Response.create(data.response, net_http_resp, {})
       end
     }
-
-    it "should call credentials to_param when :credentials are set and doing authenticated call" do
-      Dir.mktmpdir do |dir|
-        credentials = ApipieBindings::AbstractCredentials.new
-        api = ApipieBindings::API.new({
-          :uri => 'http://example.com', :apidoc_cache_base_dir => dir, :api_version => 2,
-          :credentials => credentials})
-        credentials.expects(:to_params).returns({:password => 'xxx'})
-        api.stubs(:call_client).returns(fake_empty_response)
-
-        api.http_call(:get, '/path')
-      end
-    end
 
     it "should not require credentials for loading apidoc when :apidoc_authenticated => false" do
       Dir.mktmpdir do |dir|
@@ -276,7 +361,7 @@ describe ApipieBindings::API do
         credentials = ApipieBindings::AbstractCredentials.new
         api = ApipieBindings::API.new({:uri => 'http://example.com', :apidoc_cache_base_dir => dir, :api_version => 2,
                                        :credentials => credentials})
-        api.expects(:clear_credentials)
+        credentials.expects(:clear)
         api.stubs(:call_client).raises(RestClient::Unauthorized)
         assert_raises RestClient::Unauthorized do
           api.http_call(:get, '/path')
