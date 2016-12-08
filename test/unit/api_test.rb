@@ -222,7 +222,7 @@ describe ApipieBindings::API do
         RestClient::Response.create(data.response, net_http_resp, {})
       end
     }
-    let(:authenticator) { Object.new }
+    let(:authenticator) { stub(:name => :auth) }
 
     def binding_params(cache_dir, params = {})
       base_params = {
