@@ -1,6 +1,11 @@
 Release notes
 =============
 
+### 0.0.19 (2016-12-09)
+* Support for more advanced authentication algorithms ([PR #52](https://github.com/theforeman/apipie-bindings/pull/52))
+* Show resource when inspecting Action ([PR #50](https://github.com/theforeman/apipie-bindings/pull/50))
+* Prevent rest-client timeout deprecation warnings ([PR #53](https://github.com/theforeman/apipie-bindings/pull/53))
+
 ### 0.0.18 (2016-08-31)
 * Recover from exception while inspecting error response ([#48](https://github.com/Apipie/apipie-bindings/issues/48))
 * Add yard docs for ApipieBindings::Resource class ([#47](https://github.com/Apipie/apipie-bindings/issues/47))
