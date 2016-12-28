@@ -296,8 +296,8 @@ module ApipieBindings
     private
 
     def legacy_authenticator(config)
-      if config[:user] || config[:password]
-        Authenticators::BasicAuth.new(config[:user], config[:password])
+      if config[:user] || config[:username] || config[:password]
+        Authenticators::BasicAuth.new(config[:user] || config[:username], config[:password])
       elsif config[:credentials] && config[:credentials].respond_to?(:to_params)
         log.warn("Credentials are now deprecated, use custom authenticator instead.")
         Authenticators::CredentialsLegacy.new(config[:credentials])
