@@ -1,7 +1,13 @@
 module ApipieBindings
 
   class ConfigurationError < StandardError; end
-  class DocLoadingError < StandardError; end
+  class DocLoadingError < StandardError
+    attr_reader :original_error
+    def initialize(msg, original_error)
+      super(msg)
+      @original_error = original_error
+    end
+  end
   class AuthenticatorMissingError < StandardError; end
 
   ErrorData = Struct.new(:kind, :argument, :details)
