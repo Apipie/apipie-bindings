@@ -277,11 +277,11 @@ module ApipieBindings
       unless response
         begin
           response = retrieve_apidoc_call("/apidoc/v#{@api_version}.json")
-        rescue
+        rescue Exception => e
           raise ApipieBindings::DocLoadingError.new(
-            "Could not load data from #{@uri}\n"\
+            "Could not load data from #{@uri}: #{e.message}\n"\
             " - is your server down?\n"\
-            " - was rake apipie:cache run when using apipie cache? (typical production settings)")
+            " - was rake apipie:cache run when using apipie cache? (typical production settings)", e)
         end
       end
       File.open(apidoc_cache_file, "w") { |f| f.write(response.body) }
