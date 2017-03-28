@@ -1,6 +1,11 @@
 Release notes
 =============
 
+### 0.1.0 (2017-03-28)
+* Verify SSL by default ([PR #59](https://github.com/Apipie/apipie-bindings/pull/59))
+* Do not hide exceptions during cache retrieval ([PR #57](https://github.com/Apipie/apipie-bindings/pull/57))
+* Legacy auth supports username config key ([PR #54](https://github.com/Apipie/apipie-bindings/pull/54))
+
 ### 0.0.19 (2016-12-09)
 * Support for more advanced authentication algorithms ([PR #52](https://github.com/theforeman/apipie-bindings/pull/52))
 * Show resource when inspecting Action ([PR #50](https://github.com/theforeman/apipie-bindings/pull/50))
