@@ -101,7 +101,7 @@ module ApipieBindings
       @resource_config = {
         :timeout  => config[:timeout],
         :headers  => headers,
-        :verify_ssl => false  # keep rest_client >= 1.8.0 setup comaptible
+        :verify_ssl => true
       }.merge(options)
 
       @config = config
