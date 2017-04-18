@@ -323,7 +323,14 @@ module ApipieBindings
         if [301, 302, 307].include?(response.code) && [:always, :never].include?(@follow_redirects)
           if @follow_redirects == :always
             log.debug "Response redirected to #{response.headers[:location]}"
-            response.follow_redirection(request, result, &block)
+
+            if response.method(:follow_redirection).arity == 0
+              # rest-client > 1.8
+              response.follow_redirection(&block)
+            else
+              # rest-client <= 1.8
+              response.follow_redirection(request, result, &block)
+            end
           else
             raise exception_with_response(response)
           end
