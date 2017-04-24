@@ -98,6 +98,17 @@ module ApipieBindings
       if (config[:timeout] && config[:timeout].to_i < 0)
         config[:timeout] = (RestClient.version < '1.7.0') ? -1 : nil
       end
+
+      # RestClient < 1.7.0 does not support ssl_ca_path use ssl_ca_file instead
+      if options[:ssl_ca_path] && !RestClient::Request.method_defined?(:ssl_opts)
+        parsed_uri = URI.parse(@uri)
+        cert_file =  File.join(options[:ssl_ca_path], "#{parsed_uri.host}.pem")
+        if File.exist?(cert_file)
+          options[:ssl_ca_file] = cert_file
+          log.warn "ssl_ca_path is not supported by RestClient. ssl_ca_file = #{cert_file} was used instead."
+        end
+      end
+
       @resource_config = {
         :timeout  => config[:timeout],
         :headers  => headers,
