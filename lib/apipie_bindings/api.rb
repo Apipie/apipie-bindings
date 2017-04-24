@@ -100,7 +100,7 @@ module ApipieBindings
       end
 
       # RestClient < 1.7.0 does not support ssl_ca_path use ssl_ca_file instead
-      if options[:ssl_ca_path] && !RestClient::Request.method_defined?(:ssl_ca_path) && !RestClient::Request.method_defined?(:ssl_opts)
+      if options[:ssl_ca_path] && !RestClient::Request.method_defined?(:ssl_opts)
         parsed_uri = URI.parse(@uri)
         cert_file =  File.join(options[:ssl_ca_path], "#{parsed_uri.host}.pem")
         if File.exist?(cert_file)
