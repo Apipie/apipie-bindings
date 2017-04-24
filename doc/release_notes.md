@@ -1,6 +1,11 @@
 Release notes
 =============
 
+### 0.2.0 (2017-04-24)
+* Support for overriding exceptions from authorizers ([PR #64](https://github.com/Apipie/apipie-bindings/pull/64))
+* Use ssl_ca_file with ssl_ca_path (rest-client < 1.7.0) ([PR #63](https://github.com/Apipie/apipie-bindings/pull/63)) ([#62](https://github.com/Apipie/apipie-bindings/issues/62))
+* Make following redirects compatible with rest-client > 1.8 ([PR #61](https://github.com/Apipie/apipie-bindings/pull/61)) ([#60](https://github.com/Apipie/apipie-bindings/issues/60))
+
 ### 0.1.0 (2017-03-28)
 * Verify SSL by default ([PR #59](https://github.com/Apipie/apipie-bindings/pull/59))
 * Do not hide exceptions during cache retrieval ([PR #57](https://github.com/Apipie/apipie-bindings/pull/57))

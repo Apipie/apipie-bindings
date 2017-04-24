@@ -3,6 +3,9 @@ Gemfile.lock
 Gemfile.local
 pkg
 
+# RubyMine
+.idea
+
 # Tags
 .tags
 .tags_sorted_by_file
