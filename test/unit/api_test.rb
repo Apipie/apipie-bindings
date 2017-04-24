@@ -259,6 +259,18 @@ describe ApipieBindings::API do
         end
       end
 
+      it "raises exception returned from authenticator" do
+        Dir.mktmpdir do |dir|
+          api = ApipieBindings::API.new(binding_params(dir))
+          api.stubs(:call_client).raises(RestClient::Unauthorized)
+          authenticator.expects(:error).returns(RuntimeError.new('Custom unauthorized exception'))
+          ex = assert_raises RuntimeError do
+            api.http_call(:get, '/path')
+          end
+          assert_equal 'Custom unauthorized exception', ex.message
+        end
+      end
+
       it "raises exception when authenticator wasn't provided" do
         Dir.mktmpdir do |dir|
           api = ApipieBindings::API.new(binding_params(dir, :authenticator => nil))

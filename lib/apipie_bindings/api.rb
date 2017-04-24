@@ -240,10 +240,10 @@ module ApipieBindings
           response = call_client(client, path, args)
           update_cache(response.headers[:apipie_checksum])
         rescue => e
-          @authenticator.error(e) if authenticate && @authenticator
           log.error e.message
           log.debug inspect_data(e)
-          raise
+          override_e = @authenticator.error(e) if authenticate && @authenticator
+          raise override_e.is_a?(StandardError) ? override_e : e
         end
       end
 
