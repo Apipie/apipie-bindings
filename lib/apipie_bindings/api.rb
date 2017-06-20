@@ -242,6 +242,9 @@ module ApipieBindings
         rescue => e
           log.error e.message
           log.debug inspect_data(e)
+          if e.respond_to?(:response) && e.response.respond_to?(:headers)
+            update_cache(e.response.headers[:apipie_checksum])
+          end
           override_e = @authenticator.error(e) if authenticate && @authenticator
           raise override_e.is_a?(StandardError) ? override_e : e
         end
