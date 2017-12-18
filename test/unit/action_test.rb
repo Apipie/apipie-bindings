@@ -2,8 +2,9 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 describe ApipieBindings::Action do
 
-  let(:resource) { ApipieBindings::API.new({:apidoc_cache_dir => 'test/unit/data',
-    :apidoc_cache_name => 'dummy'}).resource(:users) }
+  let(:dummy_api) { ApipieBindings::API.new({:apidoc_cache_dir => 'test/unit/data',
+    :apidoc_cache_name => 'dummy'}) }
+  let(:resource) { dummy_api.resource(:users)}
 
   it "should allow user to call the action" do
     params = { :a => 1 }
@@ -16,8 +17,21 @@ describe ApipieBindings::Action do
     resource.action(:index).routes.first.must_be_kind_of ApipieBindings::Route
   end
 
-  it "should find suitable route" do
-    resource.action(:index).find_route.path.must_equal "/users"
+  describe "#find_route" do
+    let(:archive_action) { dummy_api.resource(:comments).action(:archive) }
+
+    it "should find suitable route" do
+      resource.action(:index).find_route.path.must_equal "/users"
+    end
+
+    it "should find longest matching route" do
+      archive_action.find_route(:id => 1, :user_id => 1).path.must_equal "/archive/users/:user_id/comments/:id"
+    end
+
+    it "should find longest matching route ignoring nil params in the path" do
+      archive_action.find_route(:id => 1, :user_id => nil).path.must_equal "/archive/comments/:id"
+    end
+
   end
 
   it "should return params" do
