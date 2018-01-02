@@ -4,4 +4,3 @@ gem 'rails', '4.2.0'
 
 gem 'rails-api'
 gem 'apipie-rails', '>= 0.3.1'
-gem 'rdoc'
