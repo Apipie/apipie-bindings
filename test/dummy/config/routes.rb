@@ -6,4 +6,6 @@ Rails.application.routes.draw do
       resources :comments
     end
   end
+  get 'archive/users/:user_id/comment/:id', :to => 'comments#show'
+  get 'archive/comment/:id', :to => 'comments#show'
 end

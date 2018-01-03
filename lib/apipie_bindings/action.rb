@@ -48,7 +48,7 @@ module ApipieBindings
       sorted_routes = routes.sort_by { |r| [-1 * r.params_in_path.count, r.path] }
 
       suitable_route = sorted_routes.find do |route|
-        route.params_in_path.all? { |path_param| params.keys.map(&:to_s).include?(path_param) }
+        route.params_in_path.all? { |path_param| !params[path_param.to_sym].nil? || !params[path_param].nil? }
       end
 
       suitable_route ||= sorted_routes.last
