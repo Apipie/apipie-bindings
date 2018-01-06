@@ -1,6 +1,11 @@
 Release notes
 =============
 
+### 0.2.1 (2018-01-06)
+* Do not allow NIL as a route parameter ([PR #70](https://github.com/Apipie/apipie-bindings/pull/70)) ([#22009](http://projects.theforeman.org/issues/22009))
+* update cache on error responses ([PR #67](https://github.com/Apipie/apipie-bindings/pull/67))
+* pin oauth to support ruby < 2.0.0 ([PR #69](https://github.com/Apipie/apipie-bindings/pull/69))
+
 ### 0.2.0 (2017-04-24)
 * Support for overriding exceptions from authorizers ([PR #64](https://github.com/Apipie/apipie-bindings/pull/64))
 * Use ssl_ca_file with ssl_ca_path (rest-client < 1.7.0) ([PR #63](https://github.com/Apipie/apipie-bindings/pull/63)) ([#62](https://github.com/Apipie/apipie-bindings/issues/62))
