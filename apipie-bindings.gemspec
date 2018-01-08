@@ -25,14 +25,14 @@ EOF
 
   s.add_dependency 'json', '>= 1.2.1'
   s.add_dependency 'rest-client', '>= 1.6.5', '< 3.0.0'      # lower versions don't allow setting infinite timeouts, higher versions have different api
-  s.add_dependency 'oauth', '< 0.5.2'
+  s.add_dependency 'oauth'
   s.add_development_dependency 'rake', '~> 10.1.0'
   s.add_development_dependency 'thor'
   s.add_development_dependency 'minitest', '4.7.4'
   s.add_development_dependency 'minitest-spec-context'
-  s.add_development_dependency 'simplecov', '< 0.9.0' # 0.9.0 is not compatible with Ruby 1.8.x
+  s.add_development_dependency 'simplecov'
   s.add_development_dependency 'mocha'
   s.add_development_dependency 'ci_reporter', '>= 1.6.3', "< 2.0.0"
 
-  s.required_ruby_version = '>= 1.8.7'
+  s.required_ruby_version = '>= 2.0.0'
 end

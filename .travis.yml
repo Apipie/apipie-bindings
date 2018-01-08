@@ -1,11 +1,11 @@
 sudo: false
 language: ruby
 rvm:
-  - 1.9.3
   - 2.0.0
   - 2.2.2
   - 2.3.4
   - 2.4.1
+  - 2.5.0
 #  - ruby-head
   - jruby-19mode
 # - jruby-head
@@ -13,15 +13,4 @@ env:
   - REST_CLIENT_VERSION=1.6.0
   - REST_CLIENT_VERSION=1.7.0
   - REST_CLIENT_VERSION=1.8.0
-  - REST_CLIENT_VERSION=2.0.0.rc4
-matrix:
-  include:
-    - rvm: 1.8.7
-      env: REST_CLIENT_VERSION=1.6.0
-    - rvm: jruby-18mode
-      env: REST_CLIENT_VERSION=1.6.0
-  exclude:
-    - rvm: 1.9.3
-      env: REST_CLIENT_VERSION=2.0.0.rc4
-    - rvm: jruby-19mode
-      env: REST_CLIENT_VERSION=2.0.0.rc4
+  - REST_CLIENT_VERSION=2.0.2
