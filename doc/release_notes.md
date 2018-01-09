@@ -1,5 +1,7 @@
 Release notes
 =============
+### 0.2.2 (2018-01-09)
+* modernize ruby versions ([PR #71](https://github.com/Apipie/apipie-bindings/pull/71))
 
 ### 0.2.1 (2018-01-06)
 * Do not allow NIL as a route parameter ([PR #70](https://github.com/Apipie/apipie-bindings/pull/70)) ([#22009](http://projects.theforeman.org/issues/22009))
