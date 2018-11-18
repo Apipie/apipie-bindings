@@ -32,7 +32,7 @@ describe ApipieBindings::Param do
     param.expected_type.must_equal :hash
   end
 
-  it "should have description taht strip html tags" do
+  it "should have description that strip html tags" do
     param.description.must_equal "Architecture"
   end
 
