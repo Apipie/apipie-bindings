@@ -29,7 +29,7 @@ module ApipieBindings
     #   directory for building apidoc_cache_dir
     # @option config [String] :apidoc_cache_dir (apidoc_cache_base_dir+'/<URI>') where
     #   to cache the JSON description of the API
-    # @option config [String] :apidoc_cache_name ('default.json') name of te cache file.
+    # @option config [String] :apidoc_cache_name ('default') name of the cache file.
     #   If there is cache in the :apidoc_cache_dir, it is used.
     # @option config [String] :apidoc_authenticated (true) whether or not does the call to
     #   obtain API description use authentication. It is useful to avoid unnecessary prompts
