@@ -160,7 +160,7 @@ module ApipieBindings
 
     # Call an action in the API.
     # It finds most fitting route based on given parameters
-    # with other attributes neccessary to do an API call.
+    # with other attributes necessary to do an API call.
     # If in dry_run mode {#initialize} it finds fake response data in examples
     # or user provided data. At the end when the response format is JSON it
     # is parsed and returned as ruby objects. If server supports checksum sending
