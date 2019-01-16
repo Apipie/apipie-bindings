@@ -1,5 +1,11 @@
 Release notes
 =============
+### 0.2.3 (2019-01-16)
+* Remove error log output from specs ([PR #76](https://github.com/Apipie/apipie-bindings/pull/76))
+* Update apidoc_cache_name apidoc ([PR #74](https://github.com/Apipie/apipie-bindings/pull/74))
+* Fix typo in api docs ([PR #75](https://github.com/Apipie/apipie-bindings/pull/75))
+* Fix typo in param test ([PR #73](https://github.com/Apipie/apipie-bindings/pull/73))
+
 ### 0.2.2 (2018-01-09)
 * modernize ruby versions ([PR #71](https://github.com/Apipie/apipie-bindings/pull/71))
 
