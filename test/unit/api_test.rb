@@ -229,7 +229,8 @@ describe ApipieBindings::API do
         :uri => 'http://example.com',
         :api_version => 2,
         :apidoc_cache_base_dir => cache_dir,
-        :authenticator => authenticator
+        :authenticator => authenticator,
+        :logger => Logger.new(File::NULL)
       }
       base_params.merge(params)
     end
@@ -371,7 +372,10 @@ describe ApipieBindings::API do
     it "should call clear_credentials when doing authenticated call and auth error is raised" do
       Dir.mktmpdir do |dir|
         credentials = ApipieBindings::AbstractCredentials.new
-        api = ApipieBindings::API.new({:uri => 'http://example.com', :apidoc_cache_base_dir => dir, :api_version => 2,
+        api = ApipieBindings::API.new({:uri => 'http://example.com',
+                                       :logger => Logger.new(File::NULL),
+                                       :apidoc_cache_base_dir => dir,
+                                       :api_version => 2,
                                        :credentials => credentials})
         credentials.expects(:clear)
         api.stubs(:call_client).raises(RestClient::Unauthorized)
