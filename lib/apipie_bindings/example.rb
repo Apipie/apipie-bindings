@@ -14,7 +14,7 @@ module ApipieBindings
 
     def self.parse(example)
       prep = /(\w+)\ ([^\n]*)\n?(.*)?\n(\d+)\n(.*)/m.match(example)
-      new(*prep[1..5])
+      new(*prep[1..5]) if prep
     end
   end
 

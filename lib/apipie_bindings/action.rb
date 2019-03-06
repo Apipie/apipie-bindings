@@ -41,7 +41,7 @@ module ApipieBindings
     def examples
       apidoc[:examples].map do |example|
         ApipieBindings::Example.parse(example)
-      end
+      end.compact
     end
 
     def find_route(params={})
