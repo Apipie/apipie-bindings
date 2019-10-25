@@ -20,7 +20,6 @@ EOF
   s.files            = `git ls-files -- {lib,bin,doc,config,test}/* README* LICENSE`.split("\n")
   s.test_files       = `git ls-files -- test/*`.split("\n")
   s.extra_rdoc_files = `git ls-files -- {doc,config}/* README*`.split("\n")
-  s.has_rdoc         = 'yard'
   s.require_paths    = ["lib"]
 
   s.add_dependency 'json', '>= 1.2.1'

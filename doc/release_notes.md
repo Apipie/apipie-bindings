@@ -1,5 +1,9 @@
 Release notes
 =============
+### 0.3.0 (2019-10-25)
+* Add token based auth mechanism ([PR #77](https://github.com/Apipie/apipie-bindings/pull/77))
+* Throw malformed examples ([PR #78](https://github.com/Apipie/apipie-bindings/pull/78))
+
 ### 0.2.3 (2019-01-16)
 * Remove error log output from specs ([PR #76](https://github.com/Apipie/apipie-bindings/pull/76))
 * Update apidoc_cache_name apidoc ([PR #74](https://github.com/Apipie/apipie-bindings/pull/74))
