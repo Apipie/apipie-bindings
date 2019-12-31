@@ -20,7 +20,7 @@ module ApipieBindings
       path = params_in_path.inject(@path) do |p, param_name|
         param_value = (params[param_name.to_sym] or params[param_name.to_s]) or
           raise ArgumentError, "missing param '#{param_name}' in parameters"
-        p.sub(":#{param_name}", URI.escape(param_value.to_s))
+        p.sub(":#{param_name}", CGI.escape(param_value.to_s))
       end
     end
 

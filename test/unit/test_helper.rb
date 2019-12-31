@@ -12,6 +12,6 @@ SimpleCov.root Pathname.new(File.dirname(__FILE__) + "../../../")
 require 'minitest/autorun'
 require 'minitest/spec'
 require "minitest-spec-context"
-require "mocha/setup"
+require "mocha/minitest"
 
 require 'apipie_bindings'
