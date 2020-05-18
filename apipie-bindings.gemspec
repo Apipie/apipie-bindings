@@ -25,7 +25,7 @@ EOF
   s.add_dependency 'json', '>= 1.2.1'
   s.add_dependency 'rest-client', '>= 1.6.5', '< 3.0.0'      # lower versions don't allow setting infinite timeouts, higher versions have different api
   s.add_dependency 'oauth'
-  s.add_development_dependency 'rake', '~> 10.1.0'
+  s.add_development_dependency 'rake', '>= 12.3.3'
   s.add_development_dependency 'thor'
   s.add_development_dependency 'minitest', '4.7.4'
   s.add_development_dependency 'minitest-spec-context'
