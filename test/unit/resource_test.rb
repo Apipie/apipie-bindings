@@ -34,7 +34,7 @@ describe ApipieBindings::Resource do
   end
 
   it "should have name visible in puts" do
-    out, err = capture_io { puts resource }
+    out, _err = capture_io { puts resource }
     out.must_equal "<Resource :users>\n"
   end
 

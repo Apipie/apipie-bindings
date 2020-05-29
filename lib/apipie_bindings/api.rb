@@ -135,7 +135,7 @@ module ApipieBindings
     end
 
     def apidoc
-      @apidoc = @apidoc || load_apidoc || retrieve_apidoc
+      @apidoc ||= load_apidoc || retrieve_apidoc
       @apidoc
     end
 
@@ -280,7 +280,7 @@ module ApipieBindings
     end
 
     def retrieve_apidoc
-      FileUtils.mkdir_p(@apidoc_cache_dir) unless File.exists?(@apidoc_cache_dir)
+      FileUtils.mkdir_p(@apidoc_cache_dir) unless File.exist?(@apidoc_cache_dir)
       if language
         response = retrieve_apidoc_call("/apidoc/v#{@api_version}.#{language}.json", :safe => true)
         language_family = language.split('_').first

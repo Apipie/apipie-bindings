@@ -24,7 +24,7 @@ describe ApipieBindings::Route do
   end
 
   it "should have path visible in puts" do
-    out, err = capture_io { puts route }
+    out, _err = capture_io { puts route }
     out.must_equal "<Route /api/architectures/:id>\n"
   end
 

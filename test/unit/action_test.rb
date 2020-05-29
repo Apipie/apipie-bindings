@@ -60,7 +60,7 @@ describe ApipieBindings::Action do
       e = proc do
         resource.action(:create).validate!({ :user => { :vip => true } })
       end.must_raise(ApipieBindings::MissingArgumentsError)
-      e.message.must_match /: user\[name\]$/
+      e.message.must_match(/: user\[name\]$/)
     end
 
     it "should raise on missing nested required params (hash)" do
@@ -74,7 +74,7 @@ describe ApipieBindings::Action do
           }
         })
       end.must_raise(ApipieBindings::MissingArgumentsError)
-      e.message.must_match /: user\[address\]\[city\]$/
+      e.message.must_match(/: user\[address\]\[city\]$/)
     end
 
     it "should raise on missing nested required params (array)" do
@@ -88,7 +88,7 @@ describe ApipieBindings::Action do
           }
         })
       end.must_raise(ApipieBindings::MissingArgumentsError)
-      e.message.must_match /: user\[contacts\]\[0\]\[contact\]$/
+      e.message.must_match(/: user\[contacts\]\[0\]\[contact\]$/)
     end
 
     it "should raise on invalid param format" do
@@ -103,8 +103,8 @@ describe ApipieBindings::Action do
           }
         })
       end.must_raise(ApipieBindings::InvalidArgumentTypesError)
-      e.message.must_match /user\[contacts\]\[0\] - Hash was expected/
-      e.message.must_match /user\[contacts\]\[1\] - Hash was expected/
+      e.message.must_match(/user\[contacts\]\[0\] - Hash was expected/)
+      e.message.must_match(/user\[contacts\]\[1\] - Hash was expected/)
     end
 
     it "should accept minimal correct params" do
@@ -131,7 +131,7 @@ describe ApipieBindings::Action do
   end
 
   it "should have name visible in puts" do
-    out, err = capture_io { puts resource.action(:index) }
+    out, _err = capture_io { puts resource.action(:index) }
     out.must_equal "<Action users:index>\n"
   end
 

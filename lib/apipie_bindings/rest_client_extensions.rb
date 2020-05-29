@@ -16,7 +16,7 @@ module ApipieBindings
     end
 
     unless RestClient.before_execution_procs.include? RestClient::AUTHENTICATOR_EXTENSION
-      RestClient.add_before_execution_proc &RestClient::AUTHENTICATOR_EXTENSION
+      RestClient.add_before_execution_proc(&RestClient::AUTHENTICATOR_EXTENSION)
     end
   end
 end

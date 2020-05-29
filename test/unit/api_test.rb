@@ -76,7 +76,7 @@ describe ApipieBindings::API do
       request_args = RestClient.version >= '1.8.0' ? args.last.args : args.last
       request_args[:method] == :post && request_args[:params] == {:file => s} && request_args[:headers] == headers
     end
-    result = api.http_call(:post, '/api/path', {:file => s}, headers, {:response => :raw})
+    api.http_call(:post, '/api/path', {:file => s}, headers, {:response => :raw})
   end
 
   it "should process nil response safely" do

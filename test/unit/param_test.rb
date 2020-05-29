@@ -46,7 +46,7 @@ describe ApipieBindings::Param do
   end
 
   it "should have full name, type and required visible in puts" do
-    out, err = capture_io { puts param }
+    out, _err = capture_io { puts param }
     out.must_equal "<Param *architecture (Hash)>\n"
   end
 
