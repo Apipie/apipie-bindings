@@ -1,5 +1,8 @@
 Release notes
 =============
+### 0.4.0 (2020-05-29)
+* support Ruby 2.7 ([PR #79](https://github.com/Apipie/apipie-bindings/pull/79))
+
 ### 0.3.0 (2019-10-25)
 * Add token based auth mechanism ([PR #77](https://github.com/Apipie/apipie-bindings/pull/77))
 * Throw malformed examples ([PR #78](https://github.com/Apipie/apipie-bindings/pull/78))
