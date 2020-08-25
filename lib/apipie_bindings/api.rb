@@ -42,7 +42,7 @@ module ApipieBindings
     #   if the local cache of API description (JSON) is up to date. By default it is checked
     #   *after* each API request
     # @option config [Object] :logger (Logger.new(STDERR)) custom logger class
-    # @option config [Number] :timeout API request timeout in seconds, use -1 to disable timeout
+    # @option config [Number] :timeout API request, open and read timeout in seconds, use -1 to disable timeout
     # @option config [Symbol] :follow_redirects (:default) Possible values are :always, :never and :default.
     #   The :default is to only redirect in GET and HEAD requests (RestClient default)
     # @option config [AbstractAuthenticator] :authenticator API request authenticator
@@ -111,6 +111,8 @@ module ApipieBindings
 
       @resource_config = {
         :timeout  => config[:timeout],
+        :read_timeout  => config[:timeout],
+        :open_timeout  => config[:timeout],
         :headers  => headers,
         :verify_ssl => true
       }.merge(options)
