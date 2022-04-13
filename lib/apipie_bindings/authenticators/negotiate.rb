@@ -41,6 +41,8 @@ module ApipieBindings
         end
 
         original_request
+      rescue GSSAPI::GssApiError => e
+        raise ApipieBindings::AuthenticatorError.new(:negotiate, e)
       end
     end
   end

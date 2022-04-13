@@ -33,4 +33,12 @@ module ApipieBindings
     end
   end
 
+  class AuthenticatorError < StandardError
+    attr_reader :type, :original_error
+
+    def initialize(type, original_error)
+      @type = type
+      @original_error = original_error
+    end
+  end
 end
