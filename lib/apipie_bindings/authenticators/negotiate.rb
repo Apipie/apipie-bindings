@@ -37,6 +37,7 @@ module ApipieBindings
           @gsscli.init_context(Base64.strict_decode64(itok)) # The context should now return true
 
           cookie = raw_response['set-cookie'].split('; ')[0]
+          @auth_cookie = cookie
           original_request['Cookie'] = cookie
         end
 
