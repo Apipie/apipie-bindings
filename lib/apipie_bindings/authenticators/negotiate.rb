@@ -32,6 +32,10 @@ module ApipieBindings
         headers = { 'Authorization' => "Negotiate #{Base64.strict_encode64(token)}" }
 
         RestClient::Request.execute(@auth_request_options.merge(headers: headers, url: @authorization_url)) do |response, request, raw_response|
+          if response.code == 401
+            raise RestClient::Unauthorized.new(response), 'Negotiation authentication did not pass.'
+          end
+
           # This part is only for next calls, that could be simplified if all resources are behind negotiate auth
           itok = Array(raw_response['WWW-Authenticate']).pop.split(/\s+/).last
           @gsscli.init_context(Base64.strict_decode64(itok)) # The context should now return true
