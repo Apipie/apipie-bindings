@@ -36,6 +36,8 @@ module ApipieBindings
             raise RestClient::Unauthorized.new(response), 'Negotiation authentication did not pass.'
           end
 
+          raise ApipieBindings::AuthenticatorError.new(:negotiate, e) if response.code == 302
+
           # This part is only for next calls, that could be simplified if all resources are behind negotiate auth
           itok = Array(raw_response['WWW-Authenticate']).pop.split(/\s+/).last
           @gsscli.init_context(Base64.strict_decode64(itok)) # The context should now return true
