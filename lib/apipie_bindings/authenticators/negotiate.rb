@@ -23,6 +23,16 @@ module ApipieBindings
         @auth_request_options = auth_request_options
       end
 
+      def error(ex)
+        if ex.is_a?(GSSAPI::GssApiError)
+          raise ApipieBindings::AuthenticatorError.new(:negotiate, :no_context, ex)
+        elsif ex.is_a?(ApipieBindings::ConfigurationError)
+          raise ApipieBindings::AuthenticatorError.new(:negotiate, :configuration, ex)
+        else
+          raise ex
+        end
+      end
+
       def authenticate(original_request, args)
         require 'gssapi'
         uri = URI.parse(@authorization_url)
@@ -36,7 +46,9 @@ module ApipieBindings
             raise RestClient::Unauthorized.new(response), 'Negotiation authentication did not pass.'
           end
 
-          raise ApipieBindings::AuthenticatorError.new(:negotiate, e) if response.code == 302
+          if response.code == 302
+            raise ApipieBindings::ConfigurationError, 'Server misconfiguration detected'
+          end
 
           # This part is only for next calls, that could be simplified if all resources are behind negotiate auth
           itok = Array(raw_response['WWW-Authenticate']).pop.split(/\s+/).last
@@ -48,8 +60,6 @@ module ApipieBindings
         end
 
         original_request
-      rescue GSSAPI::GssApiError => e
-        raise ApipieBindings::AuthenticatorError.new(:negotiate, e)
       end
     end
   end
