@@ -45,8 +45,7 @@ module ApipieBindings
           if response.code == 401
             raise RestClient::Unauthorized.new(response), 'Negotiation authentication did not pass.'
           end
-
-          if response.code == 302
+          if response.code == 302 && response.headers[:location].end_with?('/users/login')
             raise ApipieBindings::ConfigurationError, 'Server misconfiguration detected'
           end
 
