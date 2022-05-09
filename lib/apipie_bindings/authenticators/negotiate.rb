@@ -1,4 +1,5 @@
 require 'apipie_bindings/authenticators/base'
+require 'gssapi'
 
 module ApipieBindings
   module Authenticators
@@ -34,7 +35,6 @@ module ApipieBindings
       end
 
       def authenticate(original_request, args)
-        require 'gssapi'
         uri = URI.parse(@authorization_url)
         @gsscli = GSSAPI::Simple.new(uri.host, @service)
 
