@@ -1,5 +1,8 @@
 Release notes
 =============
+### 0.5.0 (2022-05-10)
+* Add support for kerberos negotiate auth ([PR #81](https://github.com/Apipie/apipie-bindings/pull/81))
+
 ### 0.4.0 (2020-05-29)
 * support Ruby 2.7 ([PR #79](https://github.com/Apipie/apipie-bindings/pull/79))
 
