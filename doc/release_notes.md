@@ -1,5 +1,8 @@
 Release notes
 =============
+### 0.6.0 (2023-02-10)
+* Add basic auth external ([PR #82](https://github.com/Apipie/apipie-bindings/pull/82))
+
 ### 0.5.0 (2022-05-10)
 * Add support for kerberos negotiate auth ([PR #81](https://github.com/Apipie/apipie-bindings/pull/81))
 
