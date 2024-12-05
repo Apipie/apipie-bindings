@@ -1,0 +1,14 @@
+name: CI
+
+on:
+  - push
+  - pull_request
+
+concurrency:
+  group: ${{ github.ref_name }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests
+    uses: theforeman/actions/.github/workflows/test-gem.yml@v0
