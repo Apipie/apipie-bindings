@@ -1,6 +1,5 @@
 require 'rake/testtask'
 require 'bundler/gem_tasks'
-require 'ci/reporter/rake/minitest'
 
 task :default => :test
 
