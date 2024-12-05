@@ -22,17 +22,14 @@ EOF
   s.extra_rdoc_files = `git ls-files -- {doc,config}/* README*`.split("\n")
   s.require_paths    = ["lib"]
 
-  s.add_dependency 'json', '>= 1.2.1'
-  s.add_dependency 'rest-client', '>= 1.6.5', '< 3.0.0'      # lower versions don't allow setting infinite timeouts, higher versions have different api
-  s.add_dependency 'oauth'
+  s.add_dependency 'rest-client', '~> 2.0'
+  s.add_dependency 'oauth', '>= 0.5.5'
   s.add_dependency 'gssapi'
   s.add_development_dependency 'rake', '>= 12.3.3'
-  s.add_development_dependency 'thor'
   s.add_development_dependency 'minitest', '4.7.4'
   s.add_development_dependency 'minitest-spec-context'
   s.add_development_dependency 'simplecov'
   s.add_development_dependency 'mocha'
-  s.add_development_dependency 'ci_reporter', '>= 1.6.3', "< 2.0.0"
 
-  s.required_ruby_version = '>= 2.0.0'
+  s.required_ruby_version = '>= 2.7.0'
 end
