@@ -16,7 +16,18 @@ describe ApipieBindings::Param do
                   "full_name" => "architecture[name]",
                   "name" => "name",
                   "required" => false,
-                  "validator" => "Must be String"
+                  "validator" => "Must be String",
+                  "show" => true
+              },
+              {
+                  "allow_nil" => false,
+                  "description" => "",
+                  "expected_type" => "integer",
+                  "full_name" => "architecture[hidden]",
+                  "name" => "hidden",
+                  "required" => false,
+                  "validator" => "Must be Integer",
+                  "show" => false
               }
 
           ],
@@ -54,4 +65,9 @@ describe ApipieBindings::Param do
     param.inspect.must_equal "<Param *architecture (Hash)>"
   end
 
+  it "should have show?" do
+    param.show?.must_equal true
+    param.params.first.show?.must_equal true
+    param.params.last.show?.must_equal false
+  end
 end

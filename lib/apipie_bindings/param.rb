@@ -13,10 +13,16 @@ module ApipieBindings
       @description = param[:description].gsub(/<\/?[^>]+?>/, "")
       @required = !!param[:required]
       @validator = param[:validator]
+      # We expect a value from API param docs, but in case it's not there, we want to show it in help by default
+      @show = param[:show].nil? ? true : param[:show]
     end
 
     def required?
       @required
+    end
+
+    def show?
+      @show
     end
 
     def to_s
