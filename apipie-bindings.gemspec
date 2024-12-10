@@ -23,13 +23,13 @@ EOF
   s.require_paths    = ["lib"]
 
   s.add_dependency 'rest-client', '~> 2.0'
-  s.add_dependency 'oauth', '>= 0.5.5'
-  s.add_dependency 'gssapi'
-  s.add_development_dependency 'rake', '>= 12.3.3'
-  s.add_development_dependency 'minitest', '4.7.4'
-  s.add_development_dependency 'minitest-spec-context'
-  s.add_development_dependency 'simplecov'
-  s.add_development_dependency 'mocha'
+  s.add_dependency 'oauth', '~> 1.1'
+  s.add_dependency 'gssapi', '~> 1.3'
+  s.add_development_dependency 'rake', '~> 13.0'
+  s.add_development_dependency 'minitest', '~> 4.7'
+  s.add_development_dependency 'minitest-spec-context', '~> 0.0.5'
+  s.add_development_dependency 'simplecov', '~> 0.22'
+  s.add_development_dependency 'mocha', '~> 2.7'
 
   s.required_ruby_version = '>= 2.7.0'
 end
