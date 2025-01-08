@@ -1,5 +1,12 @@
 Release notes
 =============
+### 0.7.0 (2025-01-08)
+* Add show? method to param description ([PR #84](https://github.com/Apipie/apipie-bindings/pull/84))
+* Make dependencies stricter
+* Disable Ruby warnings in tests
+* Update dependencies
+* Use GHA instead of Travis
+
 ### 0.6.0 (2023-02-10)
 * Add basic auth external ([PR #82](https://github.com/Apipie/apipie-bindings/pull/82))
 
