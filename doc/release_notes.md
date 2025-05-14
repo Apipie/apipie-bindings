@@ -1,5 +1,8 @@
 Release notes
 =============
+### 0.7.1 (2025-05-14)
+* Pin gssapi to ~> 1.2
+
 ### 0.7.0 (2025-01-08)
 * Add show? method to param description ([PR #84](https://github.com/Apipie/apipie-bindings/pull/84))
 * Make dependencies stricter
